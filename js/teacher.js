@@ -475,54 +475,86 @@ function renderAccounts() {
   const students = getStudents();
   const search = document.getElementById('accounts-search')?.value.toLowerCase() || '';
   const filtered = search ? accounts.filter(a =>
-    a.username.toLowerCase().includes(search) || a.name.toLowerCase().includes(search)
+    a.username.toLowerCase().includes(search) ||
+    a.name.toLowerCase().includes(search) ||
+    (students.find(s => s.id === a.studentId)?.name || '').toLowerCase().includes(search)
   ) : accounts;
 
   // Summary bar
   const linked = accounts.filter(a => students.find(s => s.id === a.studentId)).length;
-  const tbody = document.getElementById('accounts-tbody');
-
-  // Stat bar
   const statBar = document.getElementById('accounts-stat-bar');
   if (statBar) {
     statBar.innerHTML = `
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
-        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
-          <div style="font-size:28px;font-weight:800;color:var(--primary);">${accounts.length}</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+        <div style="flex:1;min-width:120px;background:var(--bg-primary);border-radius:var(--radius-md);padding:14px 18px;border:1px solid var(--border);">
+          <div style="font-size:26px;font-weight:800;color:var(--primary);">${accounts.length}</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">🔐 บัญชีทั้งหมด</div>
         </div>
-        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
-          <div style="font-size:28px;font-weight:800;color:#10b981;">${linked}</div>
+        <div style="flex:1;min-width:120px;background:var(--bg-primary);border-radius:var(--radius-md);padding:14px 18px;border:1px solid var(--border);">
+          <div style="font-size:26px;font-weight:800;color:#10b981;">${linked}</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">✅ ผูกนักเรียนแล้ว</div>
         </div>
-        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
-          <div style="font-size:28px;font-weight:800;color:#f59e0b;">${accounts.length - linked}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">⚠️ ยังไม่ผูกนักเรียน</div>
+        <div style="flex:1;min-width:120px;background:var(--bg-primary);border-radius:var(--radius-md);padding:14px 18px;border:1px solid var(--border);">
+          <div style="font-size:26px;font-weight:800;color:#f59e0b;">${accounts.length - linked}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">⚠️ ยังไม่ผูก</div>
         </div>
-        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
-          <div style="font-size:28px;font-weight:800;color:#8b5cf6;">${students.length}</div>
+        <div style="flex:1;min-width:120px;background:var(--bg-primary);border-radius:var(--radius-md);padding:14px 18px;border:1px solid var(--border);">
+          <div style="font-size:26px;font-weight:800;color:#8b5cf6;">${students.length}</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">🎒 นักเรียนทั้งหมด</div>
         </div>
       </div>`;
   }
 
+  // Switch to card grid layout
+  const container = document.getElementById('accounts-card-grid');
+  if (!container) return;
+
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ยังไม่มีบัญชีนักเรียน</div><div class="empty-desc">กด &quot;+ เพิ่มบัญชีใหม่&quot; เพื่อสร้างบัญชี</div></div></td></tr>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ไม่พบบัญชี</div><div class="empty-desc">ลองเปลี่ยนคำค้นหา</div></div>';
     return;
   }
-  tbody.innerHTML = filtered.map((acc, idx) => {
+
+  container.innerHTML = filtered.map((acc, idx) => {
     const st = students.find(s => s.id === acc.studentId);
-    return `<tr>
-      <td style="color:var(--text-muted);font-size:13px;">${idx + 1}</td>
-      <td><strong style="font-family:monospace;font-size:15px;color:var(--primary);">${acc.username}</strong></td>
-      <td>${acc.name}</td>
-      <td>${st ? `<div class="student-cell"><div class="student-avatar">${st.photo}</div><div><div class="student-name">${st.name}</div><div class="student-class">${st.class}</div></div></div>` : '<span style="color:var(--text-muted)">– ยังไม่ผูก</span>'}</td>
-      <td>${st ? `<span style="background:rgba(16,185,129,0.1);color:#059669;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">✅ ผูกแล้ว</span>` : `<span style="background:rgba(245,158,11,0.1);color:#b45309;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">⚠️ ยังไม่ผูก</span>`}</td>
-      <td><code style="background:var(--bg-primary);padding:2px 8px;border-radius:6px;font-size:13px;">${acc.password}</code></td>
-      <td style="display:flex;gap:6px;">
-        <button class="btn-sm" style="color:#ef4444;border-color:#fca5a5;" onclick="deleteAccount('${acc.username}')">🗑️ ลบ</button>
-      </td>
-    </tr>`;
+    const isLinked = !!st;
+    return `
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);">
+        <!-- Header: student info -->
+        <div style="background:linear-gradient(135deg,#1d4ed8,#2563eb);padding:18px 20px;display:flex;align-items:center;gap:14px;">
+          <div style="font-size:48px;line-height:1;">${st ? st.photo : '👤'}</div>
+          <div style="color:#fff;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:2px;">${st ? st.name : '– ยังไม่ผูกนักเรียน'}</div>
+            <div style="font-size:12px;opacity:.85;">${st ? `📚 ชั้น ${st.class} &nbsp;·&nbsp; ${st.id}` : acc.name}</div>
+          </div>
+        </div>
+        <!-- Credentials box -->
+        <div style="padding:16px 20px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">ข้อมูลเข้าสู่ระบบ</div>
+          <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:12px;color:var(--text-muted);">🎒 รหัสนักเรียน</span>
+              <span style="font-family:monospace;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:.08em;">${acc.username}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:var(--text-muted);">🔑 รหัสผ่าน</span>
+              <code style="font-size:16px;font-weight:700;color:#059669;background:rgba(16,185,129,.1);padding:3px 12px;border-radius:8px;">${acc.password}</code>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:12px;color:var(--text-muted);">👨‍👩‍👧 ผู้ปกครอง</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${acc.name}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              ${isLinked
+                ? '<span style="background:rgba(16,185,129,.1);color:#059669;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">✅ ผูกแล้ว</span>'
+                : '<span style="background:rgba(245,158,11,.1);color:#b45309;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">⚠️ ยังไม่ผูก</span>'
+              }
+              <button class="btn-sm" style="color:#ef4444;border-color:#fca5a5;" onclick="deleteAccount('${acc.username}')">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
   }).join('');
 }
 
