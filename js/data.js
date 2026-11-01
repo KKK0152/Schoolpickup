@@ -1,8 +1,8 @@
 // ===== DEMO DATA =====
 const DEMO_STUDENTS = [
-  { id: 'S001', name: 'ด.ช.เก่งกาจ รักลูก', class: 'ป.3/1', parentId: 'parent01', parentName: 'นาง สมหญิง รักลูก', phone: '081-xxx-1111', photo: '👦' },
-  { id: 'S002', name: 'ด.ญ.สวยงาม ใจดี', class: 'ป.5/2', parentId: 'parent02', parentName: 'นาย สมชาย ใจดี', phone: '082-xxx-2222', photo: '👧' },
-  { id: 'S003', name: 'ด.ช.ฉลาดเฉลียว ศรีสวัสดิ์', class: 'ป.1/3', parentId: 'parent03', parentName: 'นาง วิภา ศรีสวัสดิ์', phone: '083-xxx-3333', photo: '👦' },
+  { id: 'S001', name: 'ด.ช.เก่งกาจ รักลูก', class: 'ป.3/1', parentId: '691231', parentName: 'นาง สมหญิง รักลูก', phone: '081-xxx-1111', photo: '👦' },
+  { id: 'S002', name: 'ด.ญ.สวยงาม ใจดี', class: 'ป.5/2', parentId: '691232', parentName: 'นาย สมชาย ใจดี', phone: '082-xxx-2222', photo: '👧' },
+  { id: 'S003', name: 'ด.ช.ฉลาดเฉลียว ศรีสวัสดิ์', class: 'ป.1/3', parentId: '691233', parentName: 'นาง วิภา ศรีสวัสดิ์', phone: '083-xxx-3333', photo: '👦' },
   { id: 'S004', name: 'ด.ญ.มาลี สุขใจ', class: 'ป.4/1', parentId: 'parent04', parentName: 'นาย สุริยา สุขใจ', phone: '084-xxx-4444', photo: '👧' },
   { id: 'S005', name: 'ด.ช.วิทยา เจริญ', class: 'ป.6/2', parentId: 'parent05', parentName: 'นาง พิมพ์ เจริญ', phone: '085-xxx-5555', photo: '👦' },
 ];

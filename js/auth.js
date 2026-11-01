@@ -1,8 +1,8 @@
 // ===== DEMO DATA (localStorage simulation) =====
 const DEMO_ACCOUNTS = {
-  parent01: { password: '1234', role: 'parent', name: 'นาง สมหญิง รักลูก', studentId: 'S001' },
-  parent02: { password: '1234', role: 'parent', name: 'นาย สมชาย ใจดี', studentId: 'S002' },
-  parent03: { password: '1234', role: 'parent', name: 'นาง วิภา ศรีสวัสดิ์', studentId: 'S003' },
+  '691231': { password: '1234', role: 'parent', name: 'นาง สมหญิง รักลูก', studentId: 'S001' },
+  '691232': { password: '1234', role: 'parent', name: 'นาย สมชาย ใจดี', studentId: 'S002' },
+  '691233': { password: '1234', role: 'parent', name: 'นาง วิภา ศรีสวัสดิ์', studentId: 'S003' },
   teacher01: { password: '5678', role: 'teacher', name: 'ครู พิมพ์ใจ สุขเสมอ' },
   admin: { password: 'admin', role: 'teacher', name: 'ผู้ดูแลระบบ' },
 };
@@ -19,8 +19,8 @@ function setRole(role) {
     document.getElementById('login-sub').textContent = 'กรุณาใช้บัญชีที่ได้รับจากโรงเรียน';
     document.getElementById('demo-info').innerHTML = `
       <strong>🔑 บัญชีสาธิต (ผู้ปกครอง):</strong><br/>
-      ชื่อผู้ใช้: <strong>parent01</strong> | รหัสผ่าน: <strong>1234</strong><br/>
-      ชื่อผู้ใช้: <strong>parent02</strong> | รหัสผ่าน: <strong>1234</strong>`;
+      ชื่อผู้ใช้: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
+      ชื่อผู้ใช้: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>`;
   } else {
     document.getElementById('login-title').textContent = 'เข้าสู่ระบบครู/ผู้ดูแล';
     document.getElementById('login-sub').textContent = 'สำหรับครูและเจ้าหน้าที่โรงเรียนเท่านั้น';
