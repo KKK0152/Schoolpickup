@@ -22,12 +22,12 @@ function setRole(role) {
   document.getElementById('tab-teacher').classList.toggle('active', role === 'teacher');
 
   if (role === 'parent') {
-    document.getElementById('login-title').textContent = 'เข้าสู่ระบบผู้ปกครอง';
-    document.getElementById('login-sub').textContent = 'กรุณาใช้บัญชีที่ได้รับจากโรงเรียน';
+    document.getElementById('login-title').textContent = 'เข้าสู่ระบบนักเรียน';
+    document.getElementById('login-sub').textContent = 'กรุณาใช้รหัสนักเรียนที่ได้รับจากโรงเรียน';
     document.getElementById('demo-info').innerHTML = `
-      <strong>🔑 บัญชีสาธิต (ผู้ปกครอง):</strong><br/>
-      ชื่อผู้ใช้: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
-      ชื่อผู้ใช้: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>`;
+      <strong>🔑 บัญชีสาธิต (นักเรียน):</strong><br/>
+      รหัสนักเรียน: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
+      รหัสนักเรียน: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>`;
   } else {
     document.getElementById('login-title').textContent = 'เข้าสู่ระบบครู/ผู้ดูแล';
     document.getElementById('login-sub').textContent = 'สำหรับครูและเจ้าหน้าที่โรงเรียนเท่านั้น';
@@ -80,11 +80,14 @@ function handleLogin(e) {
       return;
     }
 
-    // Save session
+    // Save session — store student name for display
+    const students = JSON.parse(localStorage.getItem('students') || '[]');
+    const linkedStudent = students.find(s => s.parentId === username);
     sessionStorage.setItem('user', JSON.stringify({
       username,
       role: account.role,
       name: account.name,
+      displayName: linkedStudent ? linkedStudent.name : account.name,
       studentId: account.studentId || null,
     }));
 

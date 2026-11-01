@@ -21,10 +21,10 @@
       </div>
     </div>
     <div class="sidebar-user">
-      <div class="sidebar-avatar">👨‍👩‍👧</div>
+      <div class="sidebar-avatar">🎒</div>
       <div class="sidebar-user-info">
-        <div class="sidebar-username" id="sidebar-name">ผู้ปกครอง</div>
-        <div class="sidebar-role">บัญชีผู้ปกครอง</div>
+        <div class="sidebar-username" id="sidebar-name">นักเรียน</div>
+        <div class="sidebar-role">บัญชีนักเรียน</div>
       </div>
     </div>
     <nav class="sidebar-nav">
@@ -109,6 +109,23 @@
             <div class="sum-num" id="card-done">0</div>
             <div class="sum-label">รับแล้ว</div>
             <div class="sum-trend">เรียบร้อย</div>
+          </div>
+        </div>
+
+        <!-- Quick Pickup Panel -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:24px;">
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">🚀 แจ้งรับ–ส่งด่วน</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">กดเพื่อแจ้งครูทันที — ข้อมูลจะปรากฏในระบบหลังบ้านของครูทันที</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button onclick="quickRequest('pickup')" style="flex:1;min-width:160px;padding:16px 20px;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border:none;border-radius:var(--radius-md);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+              🚗 ผู้ปกครองมารับ
+            </button>
+            <button onclick="quickRequest('bus')" style="flex:1;min-width:160px;padding:16px 20px;background:linear-gradient(135deg,#047857,#10b981);color:#fff;border:none;border-radius:var(--radius-md);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+              🚌 ใช้รถรับส่ง
+            </button>
+            <button onclick="quickRequest('walk')" style="flex:1;min-width:160px;padding:16px 20px;background:linear-gradient(135deg,#92400e,#f59e0b);color:#fff;border:none;border-radius:var(--radius-md);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+              🚶 เดินกลับบ้าน
+            </button>
           </div>
         </div>
 

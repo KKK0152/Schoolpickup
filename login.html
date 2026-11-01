@@ -22,7 +22,7 @@
     <div class="login-card">
       <div class="login-tabs">
         <button class="login-tab active" id="tab-parent" onclick="setRole('parent')">
-          👨‍👩‍👧 ผู้ปกครอง
+          🎒 นักเรียน
         </button>
         <button class="login-tab" id="tab-teacher" onclick="setRole('teacher')">
           👩‍🏫 ครู / ผู้ดูแล
@@ -35,10 +35,10 @@
 
         <form id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="username">ชื่อผู้ใช้ / เลขประจำตัว</label>
+            <label class="form-label" for="username">รหัสนักเรียน</label>
             <div class="form-input-wrap">
-              <span class="form-input-icon">👤</span>
-              <input type="text" id="username" class="form-input" placeholder="กรอกชื่อผู้ใช้" required autocomplete="username" />
+              <span class="form-input-icon">🎒</span>
+              <input type="text" id="username" class="form-input" placeholder="กรอกรหัสนักเรียน" required autocomplete="username" />
             </div>
           </div>
 
@@ -52,9 +52,9 @@
           </div>
 
           <div class="login-demo" id="demo-info">
-            <strong>🔑 บัญชีสาธิต (ผู้ปกครอง):</strong><br/>
-            ชื่อผู้ใช้: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
-            ชื่อผู้ใช้: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>
+            <strong>🔑 บัญชีสาธิต (นักเรียน):</strong><br/>
+            รหัสนักเรียน: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
+            รหัสนักเรียน: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>
           </div>
 
           <button type="submit" class="login-submit" id="login-btn">

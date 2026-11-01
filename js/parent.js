@@ -5,7 +5,8 @@ if (!user) throw new Error('Not auth');
 let editingId = null;
 
 // Init UI
-document.getElementById('sidebar-name').textContent = user.name;
+const displayName = user.displayName || user.name;
+document.getElementById('sidebar-name').textContent = displayName;
 updateTopbarDate();
 
 function updateTopbarDate() {
@@ -20,7 +21,7 @@ document.getElementById('notify-date').value = todayStr();
 // ===== NAVIGATION =====
 const sections = ['dashboard', 'notify', 'history', 'student-info'];
 const sectionTitles = {
-  dashboard: ['ภาพรวม', `สวัสดี, ${user.name}`],
+  dashboard: ['ภาพรวม', `สวัสดี, ${displayName}`],
   notify: ['แจ้งรับ–ส่งนักเรียน', 'กรอกข้อมูลการรับ–ส่งนักเรียนของบุตรหลาน'],
   history: ['ประวัติการรับ–ส่ง', 'ข้อมูลย้อนหลังการรับ–ส่งนักเรียน'],
   'student-info': ['ข้อมูลนักเรียน', 'รายละเอียดข้อมูลนักเรียนและผู้ปกครอง'],
@@ -164,7 +165,40 @@ function renderDashboard() {
   }).join('');
 }
 
-// ===== NOTIFY FORM =====
+// ===== QUICK REQUEST =====
+function quickRequest(type) {
+  const student = getMyStudent();
+  if (!student) { showToast('ไม่พบข้อมูลนักเรียน กรุณาติดต่อโรงเรียน', 'error'); return; }
+
+  const typeNames = { pickup: '🚗 ผู้ปกครองมารับ', bus: '🚌 รถรับส่ง', walk: '🚶 เดินกลับบ้าน' };
+  const typeNameTh = { pickup: 'ผู้ปกครองมารับ', bus: 'รถรับส่ง', walk: 'เดินกลับบ้าน' };
+
+  if (!confirm(`ยืนยันการแจ้ง "${typeNames[type]}" สำหรับ ${student.name} วันนี้?\n\nข้อมูลจะส่งถึงครูทันที`)) return;
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+  const pickups = getPickups();
+  const newRecord = {
+    id: generateId('Q'),
+    studentId: student.id,
+    date: todayStr(),
+    time: timeStr,
+    pickup_by: type === 'pickup' ? student.parentName : typeNameTh[type],
+    type: type,
+    status: 'pending',
+    note: `[แจ้งด่วนผ่านระบบ] เวลา ${timeStr} น.`,
+    created_at: now.toLocaleString('th-TH'),
+    requested_by: displayName,
+  };
+  pickups.push(newRecord);
+  savePickups(pickups);
+
+  showToast(`✅ แจ้ง${typeNames[type]} สำเร็จ! ครูได้รับข้อมูลแล้ว`);
+  renderDashboard();
+}
+
+
 function submitNotify(e) {
   e.preventDefault();
   const student = getMyStudent();
