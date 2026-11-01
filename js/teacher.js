@@ -27,14 +27,14 @@ function initStudentSelect() {
     students.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
 }
 
-// ===== NAVIGATION =====
-const sections = ['dashboard', 'today', 'record', 'students', 'accounts', 'history', 'report'];
+const sections = ['dashboard', 'today', 'record', 'students', 'accounts', 'today-status', 'history', 'report'];
 const sectionTitles = {
   dashboard: ['ภาพรวม', `สวัสดี, ${user.name}`],
-  today: ['รายการรับ–ส่งวันนี้', 'รายชื่อที่ผู้ปกครองแจ้งไว้สำหรับวันนี้'],
+  today: ['รายการรับ–ส่งวันนี้', 'รายชื่อที่ผู้ปกครองแจ้ไว้สำหรับวันนี้'],
   record: ['บันทึกการรับ–ส่ง', 'บันทึกข้อมูลการรับ–ส่งนักเรียน'],
   students: ['ข้อมูลนักเรียน', 'จัดการข้อมูลนักเรียนและผู้ปกครอง'],
-  accounts: ['บัญชีผู้ปกครอง', 'เพิ่ม/ลบบัญชีเข้าสู่ระบบสำหรับผู้ปกครอง'],
+  accounts: ['บัญชีนักเรียน', 'ฟรหัสเข้าระบบสำหรับนักเรียนทุกคน'],
+  'today-status': ['สถานะนักเรียนวันนี้', 'สถานะการรับ–ส่งของนักเรียนทุกคนสำหรับวันนี้'],
   history: ['ค้นหาประวัติ', 'ค้นหาและตรวจสอบข้อมูลย้อนหลัง'],
   report: ['รายงานสรุป', 'สถิติและรายงานการรับ–ส่งนักเรียน'],
 };
@@ -53,9 +53,53 @@ function showSection(name) {
   if (name === 'today') renderToday();
   if (name === 'students') renderStudents();
   if (name === 'accounts') renderAccounts();
+  if (name === 'today-status') renderTodayStatus();
   if (name === 'history') { renderTeacherHistory(); }
   if (name === 'report') renderReport();
   document.getElementById('sidebar').classList.remove('open');
+}
+
+// ===== TODAY STATUS (all students) =====
+function renderTodayStatus() {
+  const students = getStudents();
+  const pickups = getPickups();
+  const today = todayStr();
+
+  const statusConf = {
+    done:      { label: 'ถึงบ้านแล้ว', emoji: '🏠', bg: 'linear-gradient(135deg,#059669,#10b981)', count: 0 },
+    confirmed: { label: 'ยืนยันแล้ว', emoji: '🚗', bg: 'linear-gradient(135deg,#1d4ed8,#2563eb)', count: 0 },
+    pending:   { label: 'รอยืนยัน',   emoji: '⏳', bg: 'linear-gradient(135deg,#b45309,#f59e0b)', count: 0 },
+    none:      { label: 'ยังไม่แจ้',   emoji: '📋', bg: 'linear-gradient(135deg,#475569,#64748b)', count: 0 },
+  };
+
+  const cards = students.map(st => {
+    const todayRecs = pickups.filter(p => p.studentId === st.id && p.date === today && p.status !== 'cancelled');
+    const latest = todayRecs.sort((a,b) => b.time.localeCompare(a.time))[0] || null;
+    const key = latest ? latest.status : 'none';
+    if (statusConf[key]) statusConf[key].count++;
+    const conf = statusConf[key] || statusConf.none;
+    return `
+      <div style="background:${conf.bg};color:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+          <div style="font-size:40px;line-height:1;">${st.photo}</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;">${st.name}</div>
+            <div style="font-size:12px;opacity:.8;">📚 ชั้น ${st.class} &nbsp;·  ${st.id}</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.18);border-radius:10px;padding:10px 14px;">
+          <div style="font-size:22px;font-weight:800;margin-bottom:2px;">${conf.emoji} ${conf.label}</div>
+          ${latest ? `<div style="font-size:12px;opacity:.85;">รับโดย: ${latest.pickup_by} · ${latest.time} น.</div>` : '<div style="font-size:12px;opacity:.75;">ยังไม่มีการแจ้วันนี้</div>'}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('today-status-grid').innerHTML = cards || '<div style="color:var(--text-muted)">ไม่พบนักเรียน</div>';
+
+  const chips = Object.entries(statusConf).map(([k, v]) =>
+    `<span style="background:var(--bg-primary);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;">${v.emoji} ${v.label}: <strong>${v.count}</strong></span>`
+  ).join('');
+  document.getElementById('status-summary-chips').innerHTML = chips;
 }
 
 // ===== HELPERS =====

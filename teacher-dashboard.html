@@ -43,7 +43,10 @@
         <span class="nav-item-icon">👥</span> ข้อมูลนักเรียน
       </a>
       <a class="sidebar-nav-item" onclick="showSection('accounts')" id="nav-accounts">
-        <span class="nav-item-icon">🔐</span> บัญชีผู้ปกครอง
+        <span class="nav-item-icon">🔐</span> บัญชีนักเรียน
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('today-status')" id="nav-today-status">
+        <span class="nav-item-icon">📍</span> สถานะนักเรียนวันนี้
       </a>
       <a class="sidebar-nav-item" onclick="showSection('history')" id="nav-history">
         <span class="nav-item-icon">🔍</span> ค้นหาประวัติ
@@ -292,6 +295,20 @@
               <tbody id="accounts-tbody"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- Section: Today Status -->
+      <div id="section-today-status" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📍 สถานะนักเรียนทุกคน — วันนี้</div>
+            <div class="data-section-actions">
+              <button class="btn-sm btn-sm-primary" onclick="renderTodayStatus()">🔄 รีเฟรช</button>
+            </div>
+          </div>
+          <div id="status-summary-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;"></div>
+          <div id="today-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
         </div>
       </div>
 

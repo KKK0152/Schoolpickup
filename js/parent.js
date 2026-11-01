@@ -38,7 +38,7 @@ function showSection(name) {
   document.getElementById('topbar-sub').textContent = sub;
 
   if (name === 'dashboard') renderDashboard();
-  if (name === 'notify') renderNotifyList();
+  if (name === 'notify') { renderNotifyList(); applyLastPref(); }
   if (name === 'history') {
     if (!document.getElementById('history-month').value) {
       document.getElementById('history-month').value = todayStr().slice(0, 7);
@@ -223,7 +223,9 @@ function submitNotify(e) {
     };
     pickups.push(newPickup);
     savePickups(pickups);
-    showToast('แจ้งข้อมูลการรับ–ส่งสำเร็จ!');
+    // ❤️ จำค่าล่าสุดเพื่อใช้วันถัดไป
+    saveLastPickupPref({ type: newPickup.type, pickup_by: newPickup.pickup_by, time: newPickup.time, note: newPickup.note });
+    showToast('✅ แจ้งข้อมูลสำเร็จ! ครูได้รับข้อมูลแล้ว');
     resetNotifyForm();
     renderNotifyList();
     btn.textContent = '📝 บันทึกการแจ้ง';
@@ -235,6 +237,35 @@ function resetNotifyForm() {
   document.getElementById('notifyForm').reset();
   document.getElementById('notify-date').value = todayStr();
   document.getElementById('notify-time').value = '15:30';
+  // โหลดค่าล่าสุดกลับมา
+  applyLastPref();
+}
+
+// ===== LAST PICKUP PREFERENCE =====
+function saveLastPickupPref(pref) {
+  localStorage.setItem('lastPickup_' + user.username, JSON.stringify(pref));
+}
+
+function loadLastPickupPref() {
+  const raw = localStorage.getItem('lastPickup_' + user.username);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function applyLastPref() {
+  const pref = loadLastPickupPref();
+  const hint = document.getElementById('last-pref-hint');
+  if (!pref) { if (hint) hint.style.display = 'none'; return; }
+  const typeEl = document.getElementById('notify-type');
+  const pickupEl = document.getElementById('notify-pickup-by');
+  const noteEl = document.getElementById('notify-note');
+  if (typeEl) typeEl.value = pref.type || 'pickup';
+  if (pickupEl) pickupEl.value = pref.pickup_by || '';
+  if (noteEl && pref.note) noteEl.value = pref.note;
+  const labels = { pickup: '🚗 ผู้ปกครองมารับ', bus: '🚌 รถรับส่ง', walk: '🚶 เดินกลับบ้าน' };
+  if (hint) {
+    hint.innerHTML = `♻️ ใช้ข้อมูลเดิม: <strong>${labels[pref.type] || pref.type}</strong> — ${pref.pickup_by} &nbsp;<small style="opacity:.7">(แก้ไขได้ตามต้องการ)</small>`;
+    hint.style.display = 'block';
+  }
 }
 
 function renderNotifyList() {
