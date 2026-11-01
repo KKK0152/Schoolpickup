@@ -28,12 +28,13 @@ function initStudentSelect() {
 }
 
 // ===== NAVIGATION =====
-const sections = ['dashboard', 'today', 'record', 'students', 'history', 'report'];
+const sections = ['dashboard', 'today', 'record', 'students', 'accounts', 'history', 'report'];
 const sectionTitles = {
   dashboard: ['ภาพรวม', `สวัสดี, ${user.name}`],
   today: ['รายการรับ–ส่งวันนี้', 'รายชื่อที่ผู้ปกครองแจ้งไว้สำหรับวันนี้'],
   record: ['บันทึกการรับ–ส่ง', 'บันทึกข้อมูลการรับ–ส่งนักเรียน'],
   students: ['ข้อมูลนักเรียน', 'จัดการข้อมูลนักเรียนและผู้ปกครอง'],
+  accounts: ['บัญชีผู้ปกครอง', 'เพิ่ม/ลบบัญชีเข้าสู่ระบบสำหรับผู้ปกครอง'],
   history: ['ค้นหาประวัติ', 'ค้นหาและตรวจสอบข้อมูลย้อนหลัง'],
   report: ['รายงานสรุป', 'สถิติและรายงานการรับ–ส่งนักเรียน'],
 };
@@ -51,6 +52,7 @@ function showSection(name) {
   if (name === 'dashboard') renderDashboard();
   if (name === 'today') renderToday();
   if (name === 'students') renderStudents();
+  if (name === 'accounts') renderAccounts();
   if (name === 'history') { renderTeacherHistory(); }
   if (name === 'report') renderReport();
   document.getElementById('sidebar').classList.remove('open');
@@ -395,9 +397,112 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   if (id === 'status-modal') { statusEditingId = null; statusSelected = null; }
   if (id === 'student-modal') { editingStudentId = null; }
+  if (id === 'account-modal') { document.getElementById('acc-error').style.display = 'none'; }
 }
 
-['status-modal', 'student-modal'].forEach(id => {
+// ===== ACCOUNTS =====
+function getAccounts() {
+  const saved = localStorage.getItem('parentAccounts');
+  if (saved) return JSON.parse(saved);
+  // Load from DEMO_ACCOUNTS on first time
+  const demo = [];
+  for (const [username, acc] of Object.entries(DEMO_ACCOUNTS)) {
+    if (acc.role === 'parent') {
+      demo.push({ username, password: acc.password, name: acc.name, studentId: acc.studentId });
+    }
+  }
+  localStorage.setItem('parentAccounts', JSON.stringify(demo));
+  return demo;
+}
+
+function saveAccountsData(data) {
+  localStorage.setItem('parentAccounts', JSON.stringify(data));
+  // Sync back to DEMO_ACCOUNTS in memory
+  for (const key of Object.keys(DEMO_ACCOUNTS)) {
+    if (DEMO_ACCOUNTS[key].role === 'parent') delete DEMO_ACCOUNTS[key];
+  }
+  data.forEach(acc => {
+    DEMO_ACCOUNTS[acc.username] = { password: acc.password, role: 'parent', name: acc.name, studentId: acc.studentId };
+  });
+}
+
+function renderAccounts() {
+  const accounts = getAccounts();
+  const students = getStudents();
+  const search = document.getElementById('accounts-search')?.value.toLowerCase() || '';
+  const filtered = search ? accounts.filter(a =>
+    a.username.toLowerCase().includes(search) || a.name.toLowerCase().includes(search)
+  ) : accounts;
+
+  const tbody = document.getElementById('accounts-tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ยังไม่มีบัญชีผู้ปกครอง</div><div class="empty-desc">กด &quot;+ เพิ่มบัญชีใหม่&quot; เพื่อสร้างบัญชีผู้ปกครอง</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(acc => {
+    const st = students.find(s => s.id === acc.studentId);
+    return `<tr>
+      <td><strong style="font-family:monospace;font-size:15px;color:var(--primary);">${acc.username}</strong></td>
+      <td>${acc.name}</td>
+      <td>${st ? `<div class="student-cell"><div class="student-avatar">${st.photo}</div><div class="student-name">${st.name}</div></div>` : '<span style="color:var(--text-muted)">– ยังไม่ผูก</span>'}</td>
+      <td>${st ? st.class : '–'}</td>
+      <td><code style="background:var(--bg-primary);padding:2px 8px;border-radius:6px;font-size:13px;">${acc.password}</code></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn-sm" style="color:#ef4444;border-color:#fca5a5;" onclick="deleteAccount('${acc.username}')">🗑️ ลบ</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openAddAccount() {
+  const students = getStudents();
+  ['acc-username','acc-password','acc-name'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('acc-error').style.display = 'none';
+  const sel = document.getElementById('acc-student');
+  sel.innerHTML = '<option value="">–– เลือกนักเรียน ––</option>' +
+    students.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
+  document.getElementById('account-modal').classList.add('open');
+}
+
+function saveAccount() {
+  const username = document.getElementById('acc-username').value.trim();
+  const password = document.getElementById('acc-password').value.trim();
+  const name = document.getElementById('acc-name').value.trim();
+  const studentId = document.getElementById('acc-student').value;
+  const errEl = document.getElementById('acc-error');
+
+  if (!username || !password || !name || !studentId) {
+    errEl.textContent = '⚠️ กรุณากรอกข้อมูลให้ครบทุกช่อง';
+    errEl.style.display = 'block';
+    return;
+  }
+  const accounts = getAccounts();
+  if (accounts.find(a => a.username === username)) {
+    errEl.textContent = '⚠️ ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น';
+    errEl.style.display = 'block';
+    return;
+  }
+  accounts.push({ username, password, name, studentId });
+  saveAccountsData(accounts);
+  // Update student's parentId
+  const students = getStudents();
+  const stIdx = students.findIndex(s => s.id === studentId);
+  if (stIdx !== -1) { students[stIdx].parentId = username; students[stIdx].parentName = name; saveStudents(students); }
+
+  showToast(`เพิ่มบัญชี ${username} สำเร็จ!`);
+  closeModal('account-modal');
+  renderAccounts();
+}
+
+function deleteAccount(username) {
+  if (!confirm(`ยืนยันลบบัญชี "${username}" หรือไม่?`)) return;
+  const accounts = getAccounts().filter(a => a.username !== username);
+  saveAccountsData(accounts);
+  showToast('ลบบัญชีแล้ว', 'warning');
+  renderAccounts();
+}
+
+['status-modal', 'student-modal', 'account-modal'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) {
     if (e.target === this) closeModal(id);
   });

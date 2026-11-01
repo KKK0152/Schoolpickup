@@ -42,6 +42,9 @@
       <a class="sidebar-nav-item" onclick="showSection('students')" id="nav-students">
         <span class="nav-item-icon">👥</span> ข้อมูลนักเรียน
       </a>
+      <a class="sidebar-nav-item" onclick="showSection('accounts')" id="nav-accounts">
+        <span class="nav-item-icon">🔐</span> บัญชีผู้ปกครอง
+      </a>
       <a class="sidebar-nav-item" onclick="showSection('history')" id="nav-history">
         <span class="nav-item-icon">🔍</span> ค้นหาประวัติ
       </a>
@@ -258,6 +261,37 @@
         </div>
       </div>
 
+      <!-- Section: Accounts -->
+      <div id="section-accounts" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🔐 จัดการบัญชีผู้ปกครอง</div>
+            <div class="data-section-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="accounts-search" placeholder="ค้นหาชื่อผู้ใช้/ผู้ปกครอง..." oninput="renderAccounts()" />
+              </div>
+              <button class="btn-sm btn-sm-primary" onclick="openAddAccount()">+ เพิ่มบัญชีใหม่</button>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ชื่อผู้ใช้ (Username)</th>
+                  <th>ชื่อผู้ปกครอง</th>
+                  <th>นักเรียนที่ผูกไว้</th>
+                  <th>ชั้น</th>
+                  <th>รหัสผ่าน</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="accounts-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Section: History -->
       <div id="section-history" style="display:none">
         <div class="data-section">
@@ -399,6 +433,51 @@
       <div class="modal-footer">
         <button class="btn-cancel" onclick="closeModal('student-modal')">ยกเลิก</button>
         <button class="btn-submit" onclick="saveStudent()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Account -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🔐 เพิ่มบัญชีผู้ปกครอง</div>
+        <button class="modal-close" onclick="closeModal('account-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ใช้ (Username) *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👤</span>
+            <input type="text" id="acc-username" class="form-input" placeholder="เช่น 691234" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสผ่าน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">🔒</span>
+            <input type="text" id="acc-password" class="form-input" placeholder="รหัสผ่าน" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ปกครอง *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👨‍👩‍👧</span>
+            <input type="text" id="acc-name" class="form-input" placeholder="ชื่อ-นามสกุลผู้ปกครอง" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผูกกับนักเรียน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon form-select-icon">🎒</span>
+            <select id="acc-student" class="form-input"></select>
+          </div>
+        </div>
+        <div id="acc-error" style="display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:4px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('account-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveAccount()">💾 บันทึกบัญชี</button>
       </div>
     </div>
   </div>
