@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบบริหารจัดการการรับ–ส่งนักเรียน</title>
+  <meta name="description" content="ระบบบริหารจัดการการรับ–ส่งนักเรียน เพื่อเพิ่มความสะดวกในการแจ้งข้อมูลระหว่างผู้ปกครองกับครู ลดความผิดพลาดและการตกหล่นของข้อมูล" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-landing">
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">🏫</div>
+        <div class="logo-text">
+          <span class="logo-title">SchoolPickup</span>
+          <span class="logo-sub">ระบบรับส่งนักเรียน</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">คุณสมบัติ</a>
+        <a href="#how-it-works" class="nav-link">วิธีใช้งาน</a>
+        <a href="#about" class="nav-link">เกี่ยวกับ</a>
+        <a href="login.html" class="btn btn-primary-sm">เข้าสู่ระบบ</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="เมนู">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#features" class="mobile-link">คุณสมบัติ</a>
+      <a href="#how-it-works" class="mobile-link">วิธีใช้งาน</a>
+      <a href="#about" class="mobile-link">เกี่ยวกับ</a>
+      <a href="login.html" class="mobile-link btn-mobile">เข้าสู่ระบบ</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-container">
+      <div class="hero-content" data-animate="fade-up">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          ระบบดิจิทัลเพื่อความปลอดภัยของนักเรียน
+        </div>
+        <h1 class="hero-title">
+          ระบบบริหารจัดการ<br />
+          <span class="gradient-text">การรับ–ส่งนักเรียน</span>
+        </h1>
+        <p class="hero-desc">
+          แพลตฟอร์มที่ช่วยให้ผู้ปกครองแจ้งข้อมูลการรับ–ส่งนักเรียนได้อย่างสะดวก 
+          ครูสามารถตรวจสอบสถานะได้ทันที ลดความผิดพลาดและเพิ่มความปลอดภัย
+        </p>
+        <div class="hero-actions">
+          <a href="login.html" class="btn btn-hero-primary" id="btn-get-started">
+            <span>เริ่มใช้งานเลย</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="#how-it-works" class="btn btn-hero-outline">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            ดูวิธีการใช้งาน
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num">2</span>
+            <span class="stat-label">บทบาทผู้ใช้</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num">100%</span>
+            <span class="stat-label">ดิจิทัล</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num">24/7</span>
+            <span class="stat-label">เข้าถึงได้</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image" data-animate="fade-left">
+        <div class="hero-img-wrapper">
+          <img src="hero.jpg" alt="ระบบรับส่งนักเรียน" class="hero-img" />
+          <div class="hero-img-badge badge-pickup">
+            <div class="badge-icon">✅</div>
+            <div class="badge-info">
+              <span class="badge-title">รับนักเรียนแล้ว</span>
+              <span class="badge-sub">ด.ญ.มาลี วันนี้ 15:30</span>
+            </div>
+          </div>
+          <div class="hero-img-badge badge-notify">
+            <div class="badge-icon">🔔</div>
+            <div class="badge-info">
+              <span class="badge-title">แจ้งเตือนใหม่</span>
+              <span class="badge-sub">ผู้ปกครอง 3 ราย</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-wave">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,40 C360,80 1080,0 1440,60 L1440,100 L0,100 Z" fill="var(--bg-primary)"/></svg>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="stats-bar">
+    <div class="stats-container">
+      <div class="stats-item">
+        <div class="stats-icon">👨‍👩‍👧</div>
+        <div class="stats-text">
+          <strong>ผู้ปกครอง</strong>
+          <span>แจ้งข้อมูลได้ง่าย</span>
+        </div>
+      </div>
+      <div class="stats-item">
+        <div class="stats-icon">👩‍🏫</div>
+        <div class="stats-text">
+          <strong>ครูผู้ดูแล</strong>
+          <span>ตรวจสอบได้ทันที</span>
+        </div>
+      </div>
+      <div class="stats-item">
+        <div class="stats-icon">🔒</div>
+        <div class="stats-text">
+          <strong>ปลอดภัย</strong>
+          <span>ข้อมูลเป็นระบบ</span>
+        </div>
+      </div>
+      <div class="stats-item">
+        <div class="stats-icon">📊</div>
+        <div class="stats-text">
+          <strong>รายงาน</strong>
+          <span>ค้นหาย้อนหลังได้</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-container">
+      <div class="section-header" data-animate="fade-up">
+        <div class="section-badge">คุณสมบัติ</div>
+        <h2 class="section-title">ฟีเจอร์ที่ครอบคลุมทุกความต้องการ</h2>
+        <p class="section-desc">ระบบออกแบบมาสำหรับทั้งผู้ปกครองและครู เพื่อให้การรับ–ส่งนักเรียนเป็นเรื่องง่ายและปลอดภัย</p>
+      </div>
+
+      <div class="features-tabs">
+        <button class="tab-btn active" id="tab-parent" onclick="switchTab('parent')">
+          <span class="tab-icon">👨‍👩‍👧</span> สำหรับผู้ปกครอง
+        </button>
+        <button class="tab-btn" id="tab-teacher" onclick="switchTab('teacher')">
+          <span class="tab-icon">👩‍🏫</span> สำหรับครู/ผู้ดูแล
+        </button>
+        <button class="tab-btn" id="tab-system" onclick="switchTab('system')">
+          <span class="tab-icon">⚙️</span> ระบบอัตโนมัติ
+        </button>
+      </div>
+
+      <div class="tab-content" id="tab-content-parent">
+        <div class="features-grid">
+          <div class="feature-card" data-animate="fade-up" style="--delay:0s">
+            <div class="feature-icon-wrap" style="--color: #3b82f6">
+              <span class="feature-icon">🔐</span>
+            </div>
+            <h3>เข้าสู่ระบบได้ทันที</h3>
+            <p>ผู้ปกครองสามารถเข้าสู่ระบบด้วยบัญชีที่ได้รับจากโรงเรียน เพื่อจัดการข้อมูลการรับ–ส่งได้อย่างปลอดภัย</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.1s">
+            <div class="feature-icon-wrap" style="--color: #10b981">
+              <span class="feature-icon">📝</span>
+            </div>
+            <h3>แจ้งข้อมูลการรับ–ส่ง</h3>
+            <p>ระบุวันที่ เวลา และผู้มารับนักเรียนได้อย่างละเอียด รวมถึงหมายเหตุเพิ่มเติม</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.2s">
+            <div class="feature-icon-wrap" style="--color: #f59e0b">
+              <span class="feature-icon">✏️</span>
+            </div>
+            <h3>แก้ไขข้อมูลได้</h3>
+            <p>หากมีการเปลี่ยนแปลง สามารถแก้ไขเวลารับ–ส่งได้ก่อนที่ครูจะบันทึก</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.3s">
+            <div class="feature-icon-wrap" style="--color: #8b5cf6">
+              <span class="feature-icon">🕐</span>
+            </div>
+            <h3>ดูประวัติย้อนหลัง</h3>
+            <p>ตรวจสอบประวัติการรับ–ส่งนักเรียนของบุตรหลานย้อนหลังได้ตลอดเวลา</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.4s">
+            <div class="feature-icon-wrap" style="--color: #ef4444">
+              <span class="feature-icon">👁️</span>
+            </div>
+            <h3>ติดตามสถานะ</h3>
+            <p>ดูสถานะการรับ–ส่งที่แจ้งไว้ ว่าได้รับการยืนยันจากโรงเรียนแล้วหรือไม่</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.5s">
+            <div class="feature-icon-wrap" style="--color: #06b6d4">
+              <span class="feature-icon">📱</span>
+            </div>
+            <h3>ใช้งานได้ทุกอุปกรณ์</h3>
+            <p>รองรับทั้งโทรศัพท์มือถือ แท็บเล็ต และคอมพิวเตอร์ ไม่ต้องติดตั้งแอป</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content hidden" id="tab-content-teacher">
+        <div class="features-grid">
+          <div class="feature-card" data-animate="fade-up" style="--delay:0s">
+            <div class="feature-icon-wrap" style="--color: #3b82f6">
+              <span class="feature-icon">🔐</span>
+            </div>
+            <h3>เข้าสู่ระบบผู้ดูแล</h3>
+            <p>ครูและผู้ดูแลระบบสามารถเข้าสู่ระบบพร้อมสิทธิ์การจัดการข้อมูลอย่างครบถ้วน</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.1s">
+            <div class="feature-icon-wrap" style="--color: #10b981">
+              <span class="feature-icon">👥</span>
+            </div>
+            <h3>จัดการข้อมูลนักเรียน</h3>
+            <p>เพิ่ม แก้ไข ลบข้อมูลนักเรียนและผู้ปกครอง พร้อมกำหนดสิทธิ์การเข้าถึง</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.2s">
+            <div class="feature-icon-wrap" style="--color: #f59e0b">
+              <span class="feature-icon">📋</span>
+            </div>
+            <h3>ดูรายชื่อรับ–ส่ง</h3>
+            <p>เห็นรายชื่อนักเรียนที่ผู้ปกครองแจ้งรับ–ส่งในแต่ละวัน แบบ real-time</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.3s">
+            <div class="feature-icon-wrap" style="--color: #8b5cf6">
+              <span class="feature-icon">💾</span>
+            </div>
+            <h3>บันทึกข้อมูล</h3>
+            <p>ครูสามารถบันทึกการรับ–ส่งจริง พร้อมระบุเวลาและหมายเหตุเพิ่มเติม</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.4s">
+            <div class="feature-icon-wrap" style="--color: #ef4444">
+              <span class="feature-icon">✅</span>
+            </div>
+            <h3>ตรวจสอบสถานะ</h3>
+            <p>ตรวจสอบและอัปเดตสถานะการรับ–ส่งนักเรียนได้อย่างรวดเร็ว</p>
+          </div>
+          <div class="feature-card" data-animate="fade-up" style="--delay:0.5s">
+            <div class="feature-icon-wrap" style="--color: #06b6d4">
+              <span class="feature-icon">🔍</span>
+            </div>
+            <h3>ค้นหาประวัติ</h3>
+            <p>ค้นหาข้อมูลการรับ–ส่งย้อนหลังตามชื่อนักเรียน วันที่ หรือผู้มารับ</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content hidden" id="tab-content-system">
+        <div class="features-grid features-grid-2">
+          <div class="feature-card feature-card-lg" data-animate="fade-up" style="--delay:0s">
+            <div class="feature-icon-wrap" style="--color: #3b82f6">
+              <span class="feature-icon">🔢</span>
+            </div>
+            <h3>คำนวณรายการอัตโนมัติ</h3>
+            <p>ระบบคำนวณจำนวนรายการรับ–ส่งนักเรียนในแต่ละวันโดยอัตโนมัติ แสดงสถิติรายวัน รายสัปดาห์ และรายเดือน</p>
+            <div class="feature-preview">
+              <div class="preview-stat">
+                <span class="ps-num">28</span>
+                <span class="ps-label">รายการวันนี้</span>
+              </div>
+              <div class="preview-stat">
+                <span class="ps-num">142</span>
+                <span class="ps-label">สัปดาห์นี้</span>
+              </div>
+              <div class="preview-stat">
+                <span class="ps-num">587</span>
+                <span class="ps-label">เดือนนี้</span>
+              </div>
+            </div>
+          </div>
+          <div class="feature-card feature-card-lg" data-animate="fade-up" style="--delay:0.2s">
+            <div class="feature-icon-wrap" style="--color: #10b981">
+              <span class="feature-icon">📅</span>
+            </div>
+            <h3>จัดแยกตามวัน/เวลา</h3>
+            <p>ระบบจัดแยกข้อมูลการรับ–ส่งนักเรียนตามวันที่และช่วงเวลาโดยอัตโนมัติ ง่ายต่อการค้นหาและติดตาม</p>
+            <div class="feature-preview">
+              <div class="time-slot active">
+                <span>🌅 ช่วงเช้า</span><span>07:00 – 08:30</span>
+              </div>
+              <div class="time-slot">
+                <span>☀️ ช่วงบ่าย</span><span>14:30 – 16:30</span>
+              </div>
+              <div class="time-slot">
+                <span>🌆 ช่วงเย็น</span><span>16:30 – 18:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-container">
+      <div class="section-header" data-animate="fade-up">
+        <div class="section-badge">ขั้นตอน</div>
+        <h2 class="section-title">วิธีการใช้งานง่ายๆ</h2>
+        <p class="section-desc">เพียง 3 ขั้นตอนง่ายๆ สำหรับผู้ปกครอง</p>
+      </div>
+      <div class="steps-container">
+        <div class="step-card" data-animate="fade-up" style="--delay:0s">
+          <div class="step-number">01</div>
+          <div class="step-icon">🔐</div>
+          <h3 class="step-title">เข้าสู่ระบบ</h3>
+          <p class="step-desc">ใช้บัญชีที่ได้รับจากโรงเรียนในการเข้าสู่ระบบ เลือกบทบาทผู้ปกครอง</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card" data-animate="fade-up" style="--delay:0.2s">
+          <div class="step-number">02</div>
+          <div class="step-icon">📝</div>
+          <h3 class="step-title">แจ้งข้อมูล</h3>
+          <p class="step-desc">กรอกวันที่ เวลา และชื่อผู้มารับนักเรียน พร้อมหมายเหตุหากมี</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card" data-animate="fade-up" style="--delay:0.4s">
+          <div class="step-number">03</div>
+          <div class="step-icon">✅</div>
+          <h3 class="step-title">รอการยืนยัน</h3>
+          <p class="step-desc">ครูจะตรวจสอบและยืนยันข้อมูล คุณสามารถติดตามสถานะได้ตลอดเวลา</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roles Section -->
+  <section class="roles-section" id="about">
+    <div class="section-container">
+      <div class="section-header" data-animate="fade-up">
+        <div class="section-badge">ผู้ใช้งาน</div>
+        <h2 class="section-title">สำหรับทุกบทบาท</h2>
+        <p class="section-desc">ระบบรองรับ 2 บทบาทหลัก เพื่อการทำงานร่วมกันที่ราบรื่น</p>
+      </div>
+      <div class="roles-grid">
+        <div class="role-card role-parent" data-animate="fade-right">
+          <div class="role-header">
+            <div class="role-avatar">👨‍👩‍👧</div>
+            <div class="role-title-wrap">
+              <h3>ผู้ปกครอง</h3>
+              <span class="role-badge">Parent</span>
+            </div>
+          </div>
+          <ul class="role-features">
+            <li><span class="check">✓</span> เข้าสู่ระบบด้วยบัญชีที่ได้รับ</li>
+            <li><span class="check">✓</span> แจ้งวันที่ เวลา และผู้มารับ</li>
+            <li><span class="check">✓</span> แก้ไขข้อมูลก่อนกำหนด</li>
+            <li><span class="check">✓</span> ตรวจสอบสถานะการแจ้ง</li>
+            <li><span class="check">✓</span> ดูประวัติการรับ–ส่ง</li>
+          </ul>
+          <a href="login.html?role=parent" class="btn btn-role-parent" id="btn-parent-login">
+            เข้าสู่ระบบผู้ปกครอง
+          </a>
+        </div>
+        <div class="role-card role-teacher" data-animate="fade-left">
+          <div class="role-header">
+            <div class="role-avatar">👩‍🏫</div>
+            <div class="role-title-wrap">
+              <h3>ครู / ผู้ดูแลระบบ</h3>
+              <span class="role-badge">Teacher</span>
+            </div>
+          </div>
+          <ul class="role-features">
+            <li><span class="check">✓</span> จัดการข้อมูลนักเรียนและผู้ปกครอง</li>
+            <li><span class="check">✓</span> ดูรายชื่อที่ผู้ปกครองแจ้ง</li>
+            <li><span class="check">✓</span> บันทึกการรับ–ส่งจริง</li>
+            <li><span class="check">✓</span> ตรวจสอบและอัปเดตสถานะ</li>
+            <li><span class="check">✓</span> ค้นหาประวัติย้อนหลัง</li>
+            <li><span class="check">✓</span> ดูรายงานสรุป</li>
+          </ul>
+          <a href="login.html?role=teacher" class="btn btn-role-teacher" id="btn-teacher-login">
+            เข้าสู่ระบบครู
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container" data-animate="fade-up">
+      <div class="cta-glow"></div>
+      <h2>พร้อมเริ่มใช้งานแล้วหรือยัง?</h2>
+      <p>เพิ่มความปลอดภัยและความสะดวกในการรับ–ส่งนักเรียน เริ่มต้นได้เลยวันนี้</p>
+      <a href="login.html" class="btn btn-cta" id="btn-cta-start">เข้าสู่ระบบ →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">🏫 SchoolPickup</div>
+        <p>ระบบบริหารจัดการการรับ–ส่งนักเรียน<br/>เพื่อความปลอดภัยและสะดวกสบาย</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>เมนูหลัก</h4>
+          <a href="#features">คุณสมบัติ</a>
+          <a href="#how-it-works">วิธีใช้งาน</a>
+          <a href="#about">เกี่ยวกับระบบ</a>
+        </div>
+        <div class="footer-col">
+          <h4>เข้าสู่ระบบ</h4>
+          <a href="login.html?role=parent">ผู้ปกครอง</a>
+          <a href="login.html?role=teacher">ครู/ผู้ดูแล</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2569 ระบบบริหารจัดการการรับ–ส่งนักเรียน | โรงเรียน กรณีศึกษา</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

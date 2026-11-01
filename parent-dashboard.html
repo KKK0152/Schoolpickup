@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แดชบอร์ดผู้ปกครอง – ระบบรับส่งนักเรียน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-dashboard">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🏫</div>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-title">SchoolPickup</span>
+        <span class="sidebar-logo-sub">ระบบรับส่งนักเรียน</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">👨‍👩‍👧</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-username" id="sidebar-name">ผู้ปกครอง</div>
+        <div class="sidebar-role">บัญชีผู้ปกครอง</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">เมนูหลัก</div>
+      <a class="sidebar-nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+        <span class="nav-item-icon">📊</span> ภาพรวม
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('notify')" id="nav-notify">
+        <span class="nav-item-icon">📝</span> แจ้งรับ–ส่งนักเรียน
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('history')" id="nav-history">
+        <span class="nav-item-icon">🕐</span> ประวัติการรับ–ส่ง
+      </a>
+      <div class="nav-section-label">ข้อมูล</div>
+      <a class="sidebar-nav-item" onclick="showSection('student-info')" id="nav-student-info">
+        <span class="nav-item-icon">🎒</span> ข้อมูลนักเรียน
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span class="nav-item-icon">🚪</span> ออกจากระบบ
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="topbar-title">ภาพรวม</div>
+        <div class="page-subtitle" id="topbar-sub">ยินดีต้อนรับ</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date">กำลังโหลด...</div>
+        <div class="notif-btn" title="การแจ้งเตือน">
+          🔔<div class="notif-dot"></div>
+        </div>
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;background:none;border:none;font-size:22px;cursor:pointer;" id="hamburger-dash">☰</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Section: Dashboard -->
+      <div id="section-dashboard">
+        <div class="summary-cards">
+          <div class="sum-card" style="--card-color:#2563eb">
+            <div class="sum-icon">📋</div>
+            <div class="sum-num" id="card-today">0</div>
+            <div class="sum-label">แจ้งวันนี้</div>
+            <div class="sum-trend" id="card-today-trend">📅 วันนี้</div>
+          </div>
+          <div class="sum-card" style="--card-color:#f59e0b">
+            <div class="sum-icon">⏳</div>
+            <div class="sum-num" id="card-pending">0</div>
+            <div class="sum-label">รอยืนยัน</div>
+            <div class="sum-trend">รอการตรวจสอบ</div>
+          </div>
+          <div class="sum-card" style="--card-color:#10b981">
+            <div class="sum-icon">✅</div>
+            <div class="sum-num" id="card-confirmed">0</div>
+            <div class="sum-label">ยืนยันแล้ว</div>
+            <div class="sum-trend">พร้อมรับ</div>
+          </div>
+          <div class="sum-card" style="--card-color:#8b5cf6">
+            <div class="sum-icon">🎒</div>
+            <div class="sum-num" id="card-done">0</div>
+            <div class="sum-label">รับแล้ว</div>
+            <div class="sum-trend">เรียบร้อย</div>
+          </div>
+        </div>
+
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📋 รายการล่าสุด</div>
+            <div class="data-section-actions">
+              <button class="btn-sm btn-sm-primary" onclick="showSection('notify')">+ แจ้งรับ–ส่งใหม่</button>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>สถานะ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="recent-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Notify -->
+      <div id="section-notify" style="display:none">
+        <div class="form-card" id="notify-form-card">
+          <div class="form-card-title">📝 แจ้งข้อมูลการรับ–ส่งนักเรียน</div>
+          <form onsubmit="submitNotify(event)" id="notifyForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">วันที่ต้องการรับ/ส่ง *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">📅</span>
+                  <input type="date" id="notify-date" class="form-input" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">เวลา *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">🕐</span>
+                  <input type="time" id="notify-time" class="form-input" required value="15:30" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ชื่อผู้มารับนักเรียน *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">👤</span>
+                  <input type="text" id="notify-pickup-by" class="form-input" placeholder="ระบุชื่อผู้มารับ" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ประเภทการรับ</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon form-select-icon">🚗</span>
+                  <select id="notify-type" class="form-input">
+                    <option value="pickup">🚗 ผู้ปกครองมารับ</option>
+                    <option value="bus">🚌 รถรับส่ง</option>
+                    <option value="walk">🚶 เดินกลับบ้าน</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group form-group-full">
+                <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+                <div class="form-input-wrap">
+                  <textarea id="notify-note" class="form-input" placeholder="เช่น จะมาสาย, ให้รอที่ประตูหน้า..."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" onclick="resetNotifyForm()">ล้างข้อมูล</button>
+              <button type="submit" class="btn-submit" id="notify-submit-btn">📝 บันทึกการแจ้ง</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📋 รายการที่แจ้งไว้</div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>สถานะ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="notify-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: History -->
+      <div id="section-history" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🕐 ประวัติการรับ–ส่งนักเรียน</div>
+            <div class="data-section-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="history-search" placeholder="ค้นหา..." oninput="renderHistory()" />
+              </div>
+              <input type="month" id="history-month" class="search-input" style="padding-left:14px;width:auto;" onchange="renderHistory()" />
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>สถานะ</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Student Info -->
+      <div id="section-student-info" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">🎒 ข้อมูลนักเรียน</div>
+          <div id="student-info-content"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal: Edit -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">✏️ แก้ไขข้อมูลการรับ–ส่ง</div>
+        <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">วันที่</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">📅</span>
+            <input type="date" id="edit-date" class="form-input" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">เวลา</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">🕐</span>
+            <input type="time" id="edit-time" class="form-input" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผู้มารับ</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👤</span>
+            <input type="text" id="edit-pickup-by" class="form-input" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">หมายเหตุ</label>
+          <div class="form-input-wrap">
+            <textarea id="edit-note" class="form-input"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('edit-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveEdit()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/parent.js"></script>
+</body>
+</html>
