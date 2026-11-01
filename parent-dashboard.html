@@ -70,6 +70,21 @@
 
       <!-- Section: Dashboard -->
       <div id="section-dashboard">
+
+        <!-- Child Status Card (Big) -->
+        <div id="child-status-card" style="margin-bottom:24px;border-radius:20px;padding:28px 32px;display:flex;align-items:center;gap:28px;box-shadow:0 8px 32px rgba(0,0,0,0.12);position:relative;overflow:hidden;transition:all 0.3s;">
+          <div style="font-size:72px;line-height:1;" id="status-emoji">⏳</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;opacity:0.7;margin-bottom:6px;" id="status-label-top">สถานะวันนี้</div>
+            <div style="font-size:26px;font-weight:800;margin-bottom:4px;" id="status-child-name">กำลังโหลด...</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:8px;" id="status-main-text">–</div>
+            <div style="font-size:13px;opacity:0.75;" id="status-sub-text">–</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="status-badge-big" style="padding:10px 20px;border-radius:50px;font-size:14px;font-weight:700;display:inline-block;"></div>
+          </div>
+        </div>
+
         <div class="summary-cards">
           <div class="sum-card" style="--card-color:#2563eb">
             <div class="sum-icon">📋</div>

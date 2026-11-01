@@ -62,8 +62,75 @@ function getMyStudent() {
   return getStudents().find(s => s.parentId === user.username) || null;
 }
 
+// ===== CHILD STATUS CARD =====
+function renderChildStatus() {
+  const student = getMyStudent();
+  const card = document.getElementById('child-status-card');
+  const emojiEl = document.getElementById('status-emoji');
+  const nameEl = document.getElementById('status-child-name');
+  const mainEl = document.getElementById('status-main-text');
+  const subEl = document.getElementById('status-sub-text');
+  const badgeEl = document.getElementById('status-badge-big');
+
+  if (!student) {
+    card.style.background = 'linear-gradient(135deg,#64748b,#94a3b8)';
+    card.style.color = '#fff';
+    emojiEl.textContent = '❓';
+    nameEl.textContent = 'ไม่พบข้อมูลนักเรียน';
+    mainEl.textContent = 'กรุณาติดต่อโรงเรียน';
+    subEl.textContent = '';
+    badgeEl.style.display = 'none';
+    return;
+  }
+
+  const today = todayStr();
+  const pickups = getMyPickups().filter(p => p.date === today && p.status !== 'cancelled');
+  const latest = pickups.sort((a,b) => b.time.localeCompare(a.time))[0] || null;
+
+  nameEl.textContent = student.name + ' ' + student.photo;
+
+  if (!latest) {
+    card.style.background = 'linear-gradient(135deg,#475569,#64748b)';
+    card.style.color = '#fff';
+    emojiEl.textContent = '📋';
+    mainEl.textContent = 'ยังไม่มีการแจ้งรับ–ส่งสำหรับวันนี้';
+    subEl.textContent = 'กดเมนู "แจ้งรับ–ส่งนักเรียน" เพื่อแจ้งข้อมูล';
+    badgeEl.style.background = 'rgba(255,255,255,0.2)';
+    badgeEl.style.color = '#fff';
+    badgeEl.textContent = '📋 ยังไม่แจ้ง';
+  } else if (latest.status === 'done') {
+    card.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+    card.style.color = '#fff';
+    emojiEl.textContent = '🏠';
+    mainEl.textContent = `ถึงบ้านเรียบร้อยแล้ว! — รับโดย ${latest.pickup_by}`;
+    subEl.textContent = `เวลา ${latest.time} น. · ${typeLabel(latest.type)}`;
+    badgeEl.style.background = 'rgba(255,255,255,0.25)';
+    badgeEl.style.color = '#fff';
+    badgeEl.textContent = '✅ ถึงบ้านแล้ว';
+  } else if (latest.status === 'confirmed') {
+    card.style.background = 'linear-gradient(135deg,#1d4ed8,#2563eb)';
+    card.style.color = '#fff';
+    emojiEl.textContent = '🚗';
+    mainEl.textContent = `กำลังไปรับ — ${latest.pickup_by}`;
+    subEl.textContent = `นัดเวลา ${latest.time} น. · ${typeLabel(latest.type)}`;
+    badgeEl.style.background = 'rgba(255,255,255,0.25)';
+    badgeEl.style.color = '#fff';
+    badgeEl.textContent = '🔄 กำลังดำเนินการ';
+  } else {
+    card.style.background = 'linear-gradient(135deg,#b45309,#f59e0b)';
+    card.style.color = '#fff';
+    emojiEl.textContent = '⏳';
+    mainEl.textContent = `รอการยืนยันจากโรงเรียน`;
+    subEl.textContent = `แจ้งรับเวลา ${latest.time} น. โดย ${latest.pickup_by}`;
+    badgeEl.style.background = 'rgba(255,255,255,0.25)';
+    badgeEl.style.color = '#fff';
+    badgeEl.textContent = '⏳ รอยืนยัน';
+  }
+}
+
 // ===== DASHBOARD =====
 function renderDashboard() {
+  renderChildStatus();
   const pickups = getMyPickups();
   const today = todayStr();
   const todayPickups = pickups.filter(p => p.date === today);

@@ -1,8 +1,15 @@
 // ===== DEMO DATA (localStorage simulation) =====
 const DEMO_ACCOUNTS = {
-  '691231': { password: '1234', role: 'parent', name: 'นาง สมหญิง รักลูก', studentId: 'S001' },
-  '691232': { password: '1234', role: 'parent', name: 'นาย สมชาย ใจดี', studentId: 'S002' },
-  '691233': { password: '1234', role: 'parent', name: 'นาง วิภา ศรีสวัสดิ์', studentId: 'S003' },
+  '691231': { password: '1234', role: 'parent', name: 'นาง สมหญิง รักลูก',    studentId: 'S001' },
+  '691232': { password: '1234', role: 'parent', name: 'นาย สมชาย ใจดี',        studentId: 'S002' },
+  '691233': { password: '1234', role: 'parent', name: 'นาง วิภา ศรีสวัสดิ์',   studentId: 'S003' },
+  '691234': { password: '1234', role: 'parent', name: 'นาย สุริยา สุขใจ',      studentId: 'S004' },
+  '691235': { password: '1234', role: 'parent', name: 'นาง พิมพ์ เจริญ',       studentId: 'S005' },
+  '691236': { password: '1234', role: 'parent', name: 'นาย ธีรพล แสงทอง',     studentId: 'S006' },
+  '691237': { password: '1234', role: 'parent', name: 'นาง รัตนา มั่นคง',      studentId: 'S007' },
+  '691238': { password: '1234', role: 'parent', name: 'นาย ประสิทธิ์ ดีงาม',  studentId: 'S008' },
+  '691239': { password: '1234', role: 'parent', name: 'นาง จิราภา โชคดี',     studentId: 'S009' },
+  '691240': { password: '1234', role: 'parent', name: 'นาย วิชัย สวัสดี',      studentId: 'S010' },
   teacher01: { password: '5678', role: 'teacher', name: 'ครู พิมพ์ใจ สุขเสมอ' },
   admin: { password: 'admin', role: 'teacher', name: 'ผู้ดูแลระบบ' },
 };
