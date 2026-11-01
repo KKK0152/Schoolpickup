@@ -265,23 +265,26 @@
       <div id="section-accounts" style="display:none">
         <div class="data-section">
           <div class="data-section-header">
-            <div class="data-section-title">🔐 จัดการบัญชีผู้ปกครอง</div>
+            <div class="data-section-title">🔐 จัดการบัญชีนักเรียน / ผู้ปกครอง</div>
             <div class="data-section-actions">
               <div class="search-input-wrap">
                 <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" id="accounts-search" placeholder="ค้นหาชื่อผู้ใช้/ผู้ปกครอง..." oninput="renderAccounts()" />
+                <input type="text" class="search-input" id="accounts-search" placeholder="ค้นหารหัสนักเรียน/ชื่อผู้ปกครอง..." oninput="renderAccounts()" />
               </div>
               <button class="btn-sm btn-sm-primary" onclick="openAddAccount()">+ เพิ่มบัญชีใหม่</button>
             </div>
           </div>
+          <!-- Stat Bar -->
+          <div id="accounts-stat-bar" style="padding:0 0 4px 0;"></div>
           <div class="data-table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>ชื่อผู้ใช้ (Username)</th>
+                  <th>#</th>
+                  <th>รหัสนักเรียน</th>
                   <th>ชื่อผู้ปกครอง</th>
                   <th>นักเรียนที่ผูกไว้</th>
-                  <th>ชั้น</th>
+                  <th>สถานะ</th>
                   <th>รหัสผ่าน</th>
                   <th>จัดการ</th>
                 </tr>

@@ -434,18 +434,46 @@ function renderAccounts() {
     a.username.toLowerCase().includes(search) || a.name.toLowerCase().includes(search)
   ) : accounts;
 
+  // Summary bar
+  const linked = accounts.filter(a => students.find(s => s.id === a.studentId)).length;
   const tbody = document.getElementById('accounts-tbody');
+
+  // Stat bar
+  const statBar = document.getElementById('accounts-stat-bar');
+  if (statBar) {
+    statBar.innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
+          <div style="font-size:28px;font-weight:800;color:var(--primary);">${accounts.length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">🔐 บัญชีทั้งหมด</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
+          <div style="font-size:28px;font-weight:800;color:#10b981;">${linked}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">✅ ผูกนักเรียนแล้ว</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
+          <div style="font-size:28px;font-weight:800;color:#f59e0b;">${accounts.length - linked}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">⚠️ ยังไม่ผูกนักเรียน</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:var(--bg-primary);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--border);">
+          <div style="font-size:28px;font-weight:800;color:#8b5cf6;">${students.length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">🎒 นักเรียนทั้งหมด</div>
+        </div>
+      </div>`;
+  }
+
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ยังไม่มีบัญชีผู้ปกครอง</div><div class="empty-desc">กด &quot;+ เพิ่มบัญชีใหม่&quot; เพื่อสร้างบัญชีผู้ปกครอง</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ยังไม่มีบัญชีนักเรียน</div><div class="empty-desc">กด &quot;+ เพิ่มบัญชีใหม่&quot; เพื่อสร้างบัญชี</div></div></td></tr>';
     return;
   }
-  tbody.innerHTML = filtered.map(acc => {
+  tbody.innerHTML = filtered.map((acc, idx) => {
     const st = students.find(s => s.id === acc.studentId);
     return `<tr>
+      <td style="color:var(--text-muted);font-size:13px;">${idx + 1}</td>
       <td><strong style="font-family:monospace;font-size:15px;color:var(--primary);">${acc.username}</strong></td>
       <td>${acc.name}</td>
-      <td>${st ? `<div class="student-cell"><div class="student-avatar">${st.photo}</div><div class="student-name">${st.name}</div></div>` : '<span style="color:var(--text-muted)">– ยังไม่ผูก</span>'}</td>
-      <td>${st ? st.class : '–'}</td>
+      <td>${st ? `<div class="student-cell"><div class="student-avatar">${st.photo}</div><div><div class="student-name">${st.name}</div><div class="student-class">${st.class}</div></div></div>` : '<span style="color:var(--text-muted)">– ยังไม่ผูก</span>'}</td>
+      <td>${st ? `<span style="background:rgba(16,185,129,0.1);color:#059669;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">✅ ผูกแล้ว</span>` : `<span style="background:rgba(245,158,11,0.1);color:#b45309;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">⚠️ ยังไม่ผูก</span>`}</td>
       <td><code style="background:var(--bg-primary);padding:2px 8px;border-radius:6px;font-size:13px;">${acc.password}</code></td>
       <td style="display:flex;gap:6px;">
         <button class="btn-sm" style="color:#ef4444;border-color:#fca5a5;" onclick="deleteAccount('${acc.username}')">🗑️ ลบ</button>
