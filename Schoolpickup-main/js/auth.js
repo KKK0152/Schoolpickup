@@ -50,10 +50,10 @@ function handleLogin(e) {
   btn.innerHTML = '<span>กำลังตรวจสอบ...</span>';
 
   setTimeout(() => {
-    const studentAccounts = JSON.parse(localStorage.getItem('parentAccounts') || '[]');
-    const storedStudent = studentAccounts.find(a => a.username === username);
+    const savedAccounts = JSON.parse(localStorage.getItem('parentAccounts') || '[]');
+    const studentAccount = savedAccounts.find(a => a.username === username);
     const account = currentRole === 'parent'
-      ? (storedStudent ? { ...storedStudent, role: 'parent' } : null)
+      ? (studentAccount ? { ...studentAccount, role: 'parent' } : null)
       : DEMO_ACCOUNTS[username];
     if (!account) {
       showError('ไม่พบชื่อผู้ใช้นี้ในระบบ');

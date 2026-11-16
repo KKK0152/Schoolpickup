@@ -446,28 +446,21 @@ function closeModal(id) {
 
 // ===== ACCOUNTS =====
 function getAccounts() {
-  const saved = localStorage.getItem('parentAccounts');
-  if (saved) return JSON.parse(saved);
-  // Load from DEMO_ACCOUNTS on first time
-  const demo = [];
-  for (const [username, acc] of Object.entries(DEMO_ACCOUNTS)) {
-    if (acc.role === 'parent') {
-      demo.push({ username, password: acc.password, name: acc.name, studentId: acc.studentId });
-    }
+  let accounts = [];
+  try {
+    accounts = JSON.parse(localStorage.getItem('parentAccounts') || '[]');
+  } catch (error) {
+    console.error('อ่านบัญชีนักเรียนไม่สำเร็จ:', error);
   }
-  localStorage.setItem('parentAccounts', JSON.stringify(demo));
-  return demo;
+  if (!Array.isArray(accounts) || accounts.length === 0) {
+    accounts = DEMO_PARENT_ACCOUNTS.map(a => ({ ...a }));
+    localStorage.setItem('parentAccounts', JSON.stringify(accounts));
+  }
+  return accounts;
 }
 
 function saveAccountsData(data) {
   localStorage.setItem('parentAccounts', JSON.stringify(data));
-  // Sync back to DEMO_ACCOUNTS in memory
-  for (const key of Object.keys(DEMO_ACCOUNTS)) {
-    if (DEMO_ACCOUNTS[key].role === 'parent') delete DEMO_ACCOUNTS[key];
-  }
-  data.forEach(acc => {
-    DEMO_ACCOUNTS[acc.username] = { password: acc.password, role: 'parent', name: acc.name, studentId: acc.studentId };
-  });
 }
 
 function renderAccounts() {
@@ -510,7 +503,7 @@ function renderAccounts() {
   if (!container) return;
 
   if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ไม่พบบัญชี</div><div class="empty-desc">ลองเปลี่ยนคำค้นหา</div></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-title">ไม่พบบัญชี</div><div class="empty-desc">ยังไม่มีบัญชีนักเรียนในเบราว์เซอร์นี้ หรือไม่พบคำค้นหา กรุณารีเฟรชหน้าเว็บ</div></div>';
     return;
   }
 
@@ -583,11 +576,6 @@ function saveAccount() {
   const accounts = getAccounts();
   if (accounts.find(a => a.username === username)) {
     errEl.textContent = '⚠️ ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (accounts.find(a => a.studentId === studentId)) {
-    errEl.textContent = '⚠️ นักเรียนคนนี้มีบัญชีอยู่แล้ว กรุณาเลือกนักเรียนคนอื่น';
     errEl.style.display = 'block';
     return;
   }

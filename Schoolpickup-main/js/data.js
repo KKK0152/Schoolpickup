@@ -31,20 +31,13 @@ const DEMO_PICKUPS = [
   { id: 'P015', studentId: 'S005', date: '2026-10-30', time: '15:30', pickup_by: 'รถรับส่ง',            type: 'bus',    status: 'done',      note: '',                       created_at: '2026-10-29 18:00' },
 ];
 
-// Initialize demo data only when a storage key is missing.
-// Never overwrite changes made by the admin on subsequent page loads.
-const DEMO_PARENT_ACCOUNTS = [
-  { username: '691231', password: '1234', name: 'นาง สมหญิง รักลูก', studentId: 'S001' },
-  { username: '691232', password: '1234', name: 'นาย สมชาย ใจดี', studentId: 'S002' },
-  { username: '691233', password: '1234', name: 'นาง วิภา ศรีสวัสดิ์', studentId: 'S003' },
-  { username: '691234', password: '1234', name: 'นาย สุริยา สุขใจ', studentId: 'S004' },
-  { username: '691235', password: '1234', name: 'นาง พิมพ์ เจริญ', studentId: 'S005' },
-  { username: '691236', password: '1234', name: 'นาย ธีรพล แสงทอง', studentId: 'S006' },
-  { username: '691237', password: '1234', name: 'นาง รัตนา มั่นคง', studentId: 'S007' },
-  { username: '691238', password: '1234', name: 'นาย ประสิทธิ์ ดีงาม', studentId: 'S008' },
-  { username: '691239', password: '1234', name: 'นาง จิราภา โชคดี', studentId: 'S009' },
-  { username: '691240', password: '1234', name: 'นาย วิชัย สวัสดี', studentId: 'S010' },
-];
+// Initialize demo data safely. Preserve any non-empty data already managed by admin.
+const DEMO_PARENT_ACCOUNTS = DEMO_STUDENTS.map(st => ({
+  username: st.parentId,
+  password: '1234',
+  name: st.parentName,
+  studentId: st.id
+}));
 
 function initData() {
   if (!localStorage.getItem('students')) {
@@ -53,7 +46,11 @@ function initData() {
   if (!localStorage.getItem('pickups')) {
     localStorage.setItem('pickups', JSON.stringify(DEMO_PICKUPS));
   }
-  if (!localStorage.getItem('parentAccounts')) {
+
+  const savedAccounts = localStorage.getItem('parentAccounts');
+  let parsedAccounts = [];
+  try { parsedAccounts = savedAccounts ? JSON.parse(savedAccounts) : []; } catch (_) {}
+  if (!Array.isArray(parsedAccounts) || parsedAccounts.length === 0) {
     localStorage.setItem('parentAccounts', JSON.stringify(DEMO_PARENT_ACCOUNTS));
   }
 }
