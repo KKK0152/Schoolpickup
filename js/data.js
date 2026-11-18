@@ -167,7 +167,6 @@ function showToast(msg, type = 'success') {
   }, 3500);
 }
 
-initData();
 
 
 // Load the authenticated user's permitted data before dashboard scripts start.
