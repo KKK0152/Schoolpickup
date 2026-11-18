@@ -29,6 +29,8 @@ as $$
   );
 $$;
 
+revoke all on function public.schoolpickup_is_staff() from public, anon;
+revoke all on function public.schoolpickup_owns_student(text) from public, anon;
 grant execute on function public.schoolpickup_is_staff() to authenticated;
 grant execute on function public.schoolpickup_owns_student(text) to authenticated;
 
