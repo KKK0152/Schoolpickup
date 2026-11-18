@@ -40,10 +40,10 @@ export default async function handler(req, res) {
 
     const { username, password, name, studentId } = req.body || {};
     if (
-      typeof username !== 'string' || !/^\\d{4,20}$/.test(username.trim()) ||
+      typeof username !== 'string' || !/^\d{4,20}$/.test(username.trim()) ||
       typeof password !== 'string' || password.length < 8 ||
       typeof name !== 'string' || !name.trim() ||
-      typeof studentId !== 'string' || !/^S\\d{3,}$/.test(studentId)
+      typeof studentId !== 'string' || !/^S\d{3,}$/.test(studentId)
     ) {
       return send(res, 400, { error: 'กรุณาตรวจสอบชื่อผู้ใช้ รหัสผ่าน (อย่างน้อย 8 ตัวอักษร) ชื่อผู้ปกครอง และรหัสนักเรียน' });
     }
