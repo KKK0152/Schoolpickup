@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server Supabase environment variables are not configured.' });
   }
 
-  const token = (req.headers.authorization || '').replace(/^Bearer\\s+/, '');
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/, '');
   if (!token) return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบใหม่' });
 
   const admin = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, {
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     if (profile?.role !== 'admin') return res.status(403).json({ error: 'เฉพาะ Admin เท่านั้น' });
 
     const username = String(req.body?.username || '').trim();
-    if (!/^\\d{4,20}$/.test(username)) return res.status(400).json({ error: 'ชื่อผู้ใช้ไม่ถูกต้อง' });
+    if (!/^\d{4,20}$/.test(username)) return res.status(400).json({ error: 'ชื่อผู้ใช้ไม่ถูกต้อง' });
 
     const { data: account, error: accountError } = await admin
       .from('student_accounts')
