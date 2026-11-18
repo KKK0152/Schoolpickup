@@ -89,13 +89,24 @@ export default async function handler(req, res) {
       return send(res, 400, { error: accountError.message });
     }
 
-    const { error: guardianError } = await admin
+    const { data: oldGuardian, error: guardianLookupError } = await admin
       .from('guardians')
-      .upsert({ student_code: studentId, guardian_name: cleanName }, { onConflict: 'student_code' });
-    if (guardianError) {
+      .select('guardian_id')
+      .eq('student_code', studentId)
+      .maybeSingle();
+    if (guardianLookupError) {
       await admin.from('student_accounts').update({ auth_user_id: null }).eq('student_code', studentId);
       await admin.auth.admin.deleteUser(authUserId);
-      return send(res, 400, { error: guardianError.message });
+      return send(res, 400, { error: guardianLookupError.message });
+    }
+
+    const guardianWrite = oldGuardian
+      ? await admin.from('guardians').update({ guardian_name: cleanName }).eq('student_code', studentId)
+      : await admin.from('guardians').insert({ student_code: studentId, guardian_name: cleanName });
+    if (guardianWrite.error) {
+      await admin.from('student_accounts').update({ auth_user_id: null }).eq('student_code', studentId);
+      await admin.auth.admin.deleteUser(authUserId);
+      return send(res, 400, { error: guardianWrite.error.message });
     }
 
     const { error: profileSaveError } = await admin
