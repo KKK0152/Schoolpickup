@@ -560,7 +560,7 @@ async function saveAccount() {
     errEl.style.display = 'block';
     return;
   }
-  if (!/^\\d{4,20}$/.test(username) || password.length < 8) {
+  if (!/^\d{4,20}$/.test(username) || password.length < 8) {
     errEl.textContent = '⚠️ ชื่อผู้ใช้ต้องเป็นตัวเลข 4–20 หลัก และรหัสผ่านอย่างน้อย 8 ตัวอักษร';
     errEl.style.display = 'block';
     return;
