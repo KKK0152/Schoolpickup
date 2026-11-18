@@ -315,7 +315,19 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/parent.js"></script>
+  <script>
+    window.schoolpickupReady.then(() => {
+      const script = document.createElement('script');
+      script.src = 'js/parent.js';
+      document.body.appendChild(script);
+    }).catch(error => {
+      console.error('Schoolpickup startup failed:', error);
+      document.body.insertAdjacentHTML('beforeend',
+        '<div style="position:fixed;bottom:12px;left:12px;right:12px;background:#fee2e2;color:#991b1b;padding:14px;border-radius:10px;z-index:99999">โหลดข้อมูลออนไลน์ไม่สำเร็จ กรุณารีเฟรชหรือติดต่อผู้ดูแลระบบ</div>');
+    });
+  </script>
 </body>
 </html>
