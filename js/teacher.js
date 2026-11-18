@@ -446,28 +446,7 @@ function closeModal(id) {
 
 // ===== ACCOUNTS =====
 function getAccounts() {
-  const saved = localStorage.getItem('parentAccounts');
-  if (saved) return JSON.parse(saved);
-  // Load from DEMO_ACCOUNTS on first time
-  const demo = [];
-  for (const [username, acc] of Object.entries(DEMO_ACCOUNTS)) {
-    if (acc.role === 'parent') {
-      demo.push({ username, password: acc.password, name: acc.name, studentId: acc.studentId });
-    }
-  }
-  localStorage.setItem('parentAccounts', JSON.stringify(demo));
-  return demo;
-}
-
-function saveAccountsData(data) {
-  localStorage.setItem('parentAccounts', JSON.stringify(data));
-  // Sync back to DEMO_ACCOUNTS in memory
-  for (const key of Object.keys(DEMO_ACCOUNTS)) {
-    if (DEMO_ACCOUNTS[key].role === 'parent') delete DEMO_ACCOUNTS[key];
-  }
-  data.forEach(acc => {
-    DEMO_ACCOUNTS[acc.username] = { password: acc.password, role: 'parent', name: acc.name, studentId: acc.studentId };
-  });
+  return JSON.parse(localStorage.getItem('parentAccounts') || '[]');
 }
 
 function renderAccounts() {
@@ -535,9 +514,9 @@ function renderAccounts() {
               <span style="font-size:12px;color:var(--text-muted);">🎒 รหัสนักเรียน</span>
               <span style="font-family:monospace;font-size:20px;font-weight:800;color:var(--primary);letter-spacing:.08em;">${acc.username}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
               <span style="font-size:12px;color:var(--text-muted);">🔑 รหัสผ่าน</span>
-              <code style="font-size:16px;font-weight:700;color:#059669;background:rgba(16,185,129,.1);padding:3px 12px;border-radius:8px;">${acc.password}</code>
+              <span style="font-size:12px;color:var(--text-secondary);text-align:right;">จัดเก็บอย่างปลอดภัยใน Supabase Auth · ไม่สามารถดูย้อนหลังได้</span>
             </div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -568,42 +547,75 @@ function openAddAccount() {
   document.getElementById('account-modal').classList.add('open');
 }
 
-function saveAccount() {
+async function saveAccount() {
   const username = document.getElementById('acc-username').value.trim();
-  const password = document.getElementById('acc-password').value.trim();
+  const password = document.getElementById('acc-password').value;
   const name = document.getElementById('acc-name').value.trim();
   const studentId = document.getElementById('acc-student').value;
   const errEl = document.getElementById('acc-error');
+  const submit = document.querySelector('#account-modal .btn-submit');
 
   if (!username || !password || !name || !studentId) {
     errEl.textContent = '⚠️ กรุณากรอกข้อมูลให้ครบทุกช่อง';
     errEl.style.display = 'block';
     return;
   }
-  const accounts = getAccounts();
-  if (accounts.find(a => a.username === username)) {
-    errEl.textContent = '⚠️ ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น';
+  if (!/^\d{4,20}$/.test(username) || password.length < 8) {
+    errEl.textContent = '⚠️ ชื่อผู้ใช้ต้องเป็นตัวเลข 4–20 หลัก และรหัสผ่านอย่างน้อย 8 ตัวอักษร';
     errEl.style.display = 'block';
     return;
   }
-  accounts.push({ username, password, name, studentId });
-  saveAccountsData(accounts);
-  // Update student's parentId
-  const students = getStudents();
-  const stIdx = students.findIndex(s => s.id === studentId);
-  if (stIdx !== -1) { students[stIdx].parentId = username; students[stIdx].parentName = name; saveStudents(students); }
 
-  showToast(`เพิ่มบัญชี ${username} สำเร็จ!`);
-  closeModal('account-modal');
-  renderAccounts();
+  try {
+    submit.disabled = true;
+    submit.textContent = 'กำลังสร้างบัญชี...';
+    const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+    if (sessionError || !sessionData?.session?.access_token) throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+
+    const response = await fetch('/api/admin-create-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionData.session.access_token
+      },
+      body: JSON.stringify({ username, password, name, studentId })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'สร้างบัญชีไม่สำเร็จ');
+
+    await window.refreshSchoolpickupData();
+    showToast(`เพิ่มบัญชี ${username} สำเร็จ!`);
+    closeModal('account-modal');
+    renderAccounts();
+  } catch (error) {
+    errEl.textContent = '⚠️ ' + (error.message || 'เกิดข้อผิดพลาด');
+    errEl.style.display = 'block';
+  } finally {
+    submit.disabled = false;
+    submit.textContent = '💾 บันทึกบัญชี';
+  }
 }
 
-function deleteAccount(username) {
-  if (!confirm(`ยืนยันลบบัญชี "${username}" หรือไม่?`)) return;
-  const accounts = getAccounts().filter(a => a.username !== username);
-  saveAccountsData(accounts);
-  showToast('ลบบัญชีแล้ว', 'warning');
-  renderAccounts();
+async function deleteAccount(username) {
+  if (!confirm(`ยืนยันลบบัญชี "${username}" หรือไม่? การลบนี้จะนำบัญชีออกจาก Supabase Auth ด้วย`)) return;
+  try {
+    const { data: sessionData } = await window.supabaseClient.auth.getSession();
+    const response = await fetch('/api/admin-delete-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionData.session.access_token
+      },
+      body: JSON.stringify({ username })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'ลบบัญชีไม่สำเร็จ');
+    await window.refreshSchoolpickupData();
+    showToast('ลบบัญชีออนไลน์แล้ว', 'warning');
+    renderAccounts();
+  } catch (error) {
+    showToast(error.message || 'ลบบัญชีไม่สำเร็จ', 'error');
+  }
 }
 
 ['status-modal', 'student-modal', 'account-modal'].forEach(id => {

@@ -31,26 +31,66 @@ const DEMO_PICKUPS = [
   { id: 'P015', studentId: 'S005', date: '2026-10-30', time: '15:30', pickup_by: 'รถรับส่ง',            type: 'bus',    status: 'done',      note: '',                       created_at: '2026-10-29 18:00' },
 ];
 
-// Init data to localStorage (force reload demo data)
-function initData() {
-  localStorage.setItem('students', JSON.stringify(DEMO_STUDENTS));
-  localStorage.setItem('pickups', JSON.stringify(DEMO_PICKUPS));
-  localStorage.setItem('parentAccounts', JSON.stringify(
-    Object.entries(DEMO_ACCOUNTS)
-      .filter(([,v]) => v.role === 'parent')
-      .map(([username, v]) => ({ username, password: v.password, name: v.name, studentId: v.studentId }))
-  ));
-}
-if (!localStorage.getItem('dataVersion') || localStorage.getItem('dataVersion') !== '2') {
-  initData();
-  localStorage.setItem('dataVersion', '2');
-}
-
+// Remote data cache backed by Supabase. No demo records are re-seeded on page load.
 function getStudents() { return JSON.parse(localStorage.getItem('students') || '[]'); }
 function getPickups() { return JSON.parse(localStorage.getItem('pickups') || '[]'); }
-function savePickups(data) { localStorage.setItem('pickups', JSON.stringify(data)); }
-function saveStudents(data) { localStorage.setItem('students', JSON.stringify(data)); }
+function savePickups(data) {
+  localStorage.setItem('pickups', JSON.stringify(data));
+  persistPickups(data).catch(error => {
+    console.error('บันทึกข้อมูลรับ-ส่งออนไลน์ไม่สำเร็จ:', error);
+    showToast('บันทึกข้อมูลออนไลน์ไม่สำเร็จ กรุณาลองใหม่', 'error');
+  });
+}
+function saveStudents(data) {
+  localStorage.setItem('students', JSON.stringify(data));
+  persistStudents(data).catch(error => {
+    console.error('บันทึกข้อมูลนักเรียนออนไลน์ไม่สำเร็จ:', error);
+    showToast('บันทึกข้อมูลนักเรียนออนไลน์ไม่สำเร็จ', 'error');
+  });
+}
+async function persistStudents(data) {
+  if (!window.currentSchoolpickupUser || !['admin', 'teacher'].includes(window.currentSchoolpickupUser.role)) {
+    throw new Error('ไม่มีสิทธิ์แก้ไขข้อมูลนักเรียน');
+  }
+  const studentRows = data.map(s => ({
+    student_code: s.id,
+    student_name: s.name,
+    class_name: s.class,
+    photo_emoji: s.photo || '🎒'
+  }));
+  const { error: studentError } = await window.supabaseClient
+    .from('students').upsert(studentRows, { onConflict: 'student_code' });
+  if (studentError) throw studentError;
 
+  const guardianRows = data.map(s => ({
+    student_code: s.id,
+    guardian_name: s.parentName || '',
+    phone: s.phone || null
+  }));
+  const { error: guardianError } = await window.supabaseClient
+    .from('guardians').upsert(guardianRows, { onConflict: 'student_code' });
+  if (guardianError) throw guardianError;
+}
+async function persistPickups(data) {
+  const current = window.currentSchoolpickupUser;
+  if (!current?.id) throw new Error('ไม่พบผู้ใช้ที่เข้าสู่ระบบ');
+  const rows = data.filter(p => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(p.id))
+    .map(p => ({
+      request_id: p.id,
+      student_code: p.studentId,
+      created_by: p.created_by || current.id,
+      request_date: p.date,
+      request_time: p.time || null,
+      pickup_by: p.pickup_by,
+      request_type: p.type,
+      status: p.status,
+      note: p.note || null
+    }));
+  if (!rows.length) return;
+  const { error } = await window.supabaseClient
+    .from('pickup_requests').upsert(rows, { onConflict: 'request_id' });
+  if (error) throw error;
+}
 function getUser() {
   const u = sessionStorage.getItem('user');
   return u ? JSON.parse(u) : null;
@@ -59,11 +99,17 @@ function getUser() {
 function requireAuth(role) {
   const user = getUser();
   if (!user) { window.location.href = 'login.html'; return null; }
-  if (role && user.role !== role) { window.location.href = 'login.html'; return null; }
+  if (role === 'teacher' && !['teacher', 'admin'].includes(user.role)) {
+    window.location.href = 'login.html'; return null;
+  }
+  if (role && role !== 'teacher' && user.role !== role) {
+    window.location.href = 'login.html'; return null;
+  }
   return user;
 }
 
-function logout() {
+async function logout() {
+  await window.supabaseClient.auth.signOut();
   sessionStorage.removeItem('user');
   window.location.href = 'login.html';
 }
@@ -98,7 +144,8 @@ function typeLabel(type) {
 }
 
 function generateId(prefix) {
-  return prefix + Date.now().toString(36).toUpperCase();
+  // Supabase pickup_requests.request_id is UUID. Prefix is kept for call compatibility.
+  return crypto.randomUUID();
 }
 
 // Toast notification
@@ -120,4 +167,115 @@ function showToast(msg, type = 'success') {
   }, 3500);
 }
 
-initData();
+
+
+// Load the authenticated user's permitted data before dashboard scripts start.
+async function loadRemoteData() {
+  const client = window.supabaseClient;
+  if (!client) throw new Error('ยังไม่ได้ตั้งค่า Supabase client');
+
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
+  if (sessionError) throw sessionError;
+  const session = sessionData?.session;
+  if (!session?.user) {
+    window.location.replace('login.html');
+    throw new Error('กรุณาเข้าสู่ระบบ');
+  }
+
+  const authUser = session.user;
+  const { data: profile, error: profileError } = await client
+    .from('profiles')
+    .select('display_name, role')
+    .eq('user_id', authUser.id)
+    .maybeSingle();
+  if (profileError) throw profileError;
+  if (!profile || !['admin', 'teacher', 'parent'].includes(profile.role)) {
+    await client.auth.signOut();
+    window.location.replace('login.html');
+    throw new Error('บัญชีนี้ยังไม่ได้กำหนดสิทธิ์ใน profiles');
+  }
+
+  const { data: accountRows, error: accountError } = await client
+    .from('student_accounts')
+    .select('student_code, username, auth_user_id');
+  if (accountError) throw accountError;
+
+  const { data: studentRows, error: studentError } = await client
+    .from('students')
+    .select('student_code, student_name, class_name, photo_emoji');
+  if (studentError) throw studentError;
+
+  const { data: guardianRows, error: guardianError } = await client
+    .from('guardians')
+    .select('student_code, guardian_name, phone');
+  if (guardianError) throw guardianError;
+
+  const { data: pickupRows, error: pickupError } = await client
+    .from('pickup_requests')
+    .select('request_id, student_code, created_by, request_date, request_time, pickup_by, request_type, status, note, created_at')
+    .order('request_date', { ascending: false });
+  if (pickupError) throw pickupError;
+
+  const studentByCode = new Map((studentRows || []).map(s => [s.student_code, s]));
+  const guardianByCode = new Map((guardianRows || []).map(g => [g.student_code, g]));
+  const accounts = (accountRows || []).map(a => {
+    const g = guardianByCode.get(a.student_code);
+    const s = studentByCode.get(a.student_code);
+    return {
+      username: a.username,
+      name: g?.guardian_name || '',
+      studentId: a.student_code,
+      authUserId: a.auth_user_id,
+      studentName: s?.student_name || '',
+      phone: g?.phone || ''
+    };
+  });
+
+  const students = (studentRows || []).map(s => {
+    const g = guardianByCode.get(s.student_code) || {};
+    const a = (accountRows || []).find(item => item.student_code === s.student_code);
+    return {
+      id: s.student_code,
+      name: s.student_name,
+      class: s.class_name,
+      photo: s.photo_emoji || '🎒',
+      parentId: a?.username || '',
+      parentName: g.guardian_name || '',
+      phone: g.phone || ''
+    };
+  });
+
+  const pickups = (pickupRows || []).map(p => ({
+    id: p.request_id,
+    studentId: p.student_code,
+    date: p.request_date,
+    time: p.request_time || '',
+    pickup_by: p.pickup_by,
+    type: p.request_type,
+    status: p.status,
+    note: p.note || '',
+    created_at: p.created_at,
+    created_by: p.created_by
+  }));
+
+  localStorage.setItem('students', JSON.stringify(students));
+  localStorage.setItem('pickups', JSON.stringify(pickups));
+  localStorage.setItem('parentAccounts', JSON.stringify(accounts));
+  localStorage.setItem('dataVersion', '3');
+
+  const currentAccount = accounts.find(a => a.authUserId === authUser.id);
+  const appUser = {
+    id: authUser.id,
+    username: currentAccount?.username || (authUser.email || '').split('@')[0],
+    role: profile.role,
+    name: profile.display_name || currentAccount?.name || authUser.email,
+    displayName: profile.display_name || currentAccount?.name || authUser.email,
+    studentId: currentAccount?.studentId || null
+  };
+  window.currentSchoolpickupUser = appUser;
+  sessionStorage.setItem('user', JSON.stringify(appUser));
+  return appUser;
+}
+
+window.refreshSchoolpickupData = loadRemoteData;
+window.schoolpickupReady = loadRemoteData();

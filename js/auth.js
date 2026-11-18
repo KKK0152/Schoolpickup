@@ -1,19 +1,4 @@
-// ===== DEMO DATA (localStorage simulation) =====
-const DEMO_ACCOUNTS = {
-  '691231': { password: '1234', role: 'parent', name: 'นาง สมหญิง รักลูก',    studentId: 'S001' },
-  '691232': { password: '1234', role: 'parent', name: 'นาย สมชาย ใจดี',        studentId: 'S002' },
-  '691233': { password: '1234', role: 'parent', name: 'นาง วิภา ศรีสวัสดิ์',   studentId: 'S003' },
-  '691234': { password: '1234', role: 'parent', name: 'นาย สุริยา สุขใจ',      studentId: 'S004' },
-  '691235': { password: '1234', role: 'parent', name: 'นาง พิมพ์ เจริญ',       studentId: 'S005' },
-  '691236': { password: '1234', role: 'parent', name: 'นาย ธีรพล แสงทอง',     studentId: 'S006' },
-  '691237': { password: '1234', role: 'parent', name: 'นาง รัตนา มั่นคง',      studentId: 'S007' },
-  '691238': { password: '1234', role: 'parent', name: 'นาย ประสิทธิ์ ดีงาม',  studentId: 'S008' },
-  '691239': { password: '1234', role: 'parent', name: 'นาง จิราภา โชคดี',     studentId: 'S009' },
-  '691240': { password: '1234', role: 'parent', name: 'นาย วิชัย สวัสดี',      studentId: 'S010' },
-  teacher01: { password: '5678', role: 'teacher', name: 'ครู พิมพ์ใจ สุขเสมอ' },
-  admin: { password: 'admin', role: 'teacher', name: 'ผู้ดูแลระบบ' },
-};
-
+// ===== SUPABASE AUTHENTICATION =====
 let currentRole = 'parent';
 
 function setRole(role) {
@@ -23,18 +8,16 @@ function setRole(role) {
 
   if (role === 'parent') {
     document.getElementById('login-title').textContent = 'เข้าสู่ระบบนักเรียน';
-    document.getElementById('login-sub').textContent = 'กรุณาใช้รหัสนักเรียนที่ได้รับจากโรงเรียน';
-    document.getElementById('demo-info').innerHTML = `
-      <strong>🔑 บัญชีสาธิต (นักเรียน):</strong><br/>
-      รหัสนักเรียน: <strong>691231</strong> | รหัสผ่าน: <strong>1234</strong><br/>
-      รหัสนักเรียน: <strong>691232</strong> | รหัสผ่าน: <strong>1234</strong>`;
+    document.getElementById('login-sub').textContent = 'กรุณาใช้ชื่อผู้ใช้และรหัสผ่านที่โรงเรียนกำหนด';
+    document.getElementById('demo-info').innerHTML =
+      'บัญชีนักเรียนใช้เลขประจำตัว เช่น <strong>691231</strong> และรหัสผ่านที่ได้รับจากโรงเรียน';
+    document.getElementById('username').placeholder = 'กรอกเลขประจำตัวนักเรียน';
   } else {
     document.getElementById('login-title').textContent = 'เข้าสู่ระบบครู/ผู้ดูแล';
-    document.getElementById('login-sub').textContent = 'สำหรับครูและเจ้าหน้าที่โรงเรียนเท่านั้น';
-    document.getElementById('demo-info').innerHTML = `
-      <strong>🔑 บัญชีสาธิต (ครู/ผู้ดูแล):</strong><br/>
-      ชื่อผู้ใช้: <strong>teacher01</strong> | รหัสผ่าน: <strong>5678</strong><br/>
-      ชื่อผู้ใช้: <strong>admin</strong> | รหัสผ่าน: <strong>admin</strong>`;
+    document.getElementById('login-sub').textContent = 'สำหรับครูและผู้ดูแลระบบเท่านั้น';
+    document.getElementById('demo-info').innerHTML =
+      'กรอกชื่อผู้ใช้เจ้าหน้าที่ที่ได้รับจากผู้ดูแลระบบ';
+    document.getElementById('username').placeholder = 'กรอกชื่อผู้ใช้เจ้าหน้าที่';
   }
 
   document.getElementById('error-msg').style.display = 'none';
@@ -48,7 +31,7 @@ function togglePassword() {
   document.getElementById('toggle-password').textContent = pw.type === 'password' ? '👁️' : '🙈';
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
@@ -56,50 +39,65 @@ function handleLogin(e) {
   const errMsg = document.getElementById('error-msg');
 
   errMsg.style.display = 'none';
+  btn.disabled = true;
   btn.classList.add('loading');
   btn.innerHTML = '<span>กำลังตรวจสอบ...</span>';
 
-  setTimeout(() => {
-    const account = DEMO_ACCOUNTS[username];
-    if (!account) {
-      showError('ไม่พบชื่อผู้ใช้นี้ในระบบ');
-      btn.classList.remove('loading');
-      btn.innerHTML = '<span>เข้าสู่ระบบ</span><span>→</span>';
-      return;
-    }
-    if (account.password !== password) {
-      showError('รหัสผ่านไม่ถูกต้อง');
-      btn.classList.remove('loading');
-      btn.innerHTML = '<span>เข้าสู่ระบบ</span><span>→</span>';
-      return;
-    }
-    if (account.role !== currentRole) {
-      showError(`บัญชีนี้เป็นบัญชี${account.role === 'parent' ? 'ผู้ปกครอง' : 'ครู'} ไม่ใช่บัญชี${currentRole === 'parent' ? 'ผู้ปกครอง' : 'ครู'}`);
-      btn.classList.remove('loading');
-      btn.innerHTML = '<span>เข้าสู่ระบบ</span><span>→</span>';
-      return;
+  try {
+    if (!window.supabaseClient) throw new Error('ยังไม่ได้โหลด Supabase กรุณารีเฟรชหน้าเว็บ');
+
+    // Usernames map to the non-deliverable demo email identifiers created in Supabase Auth.
+    const email = `${username}@schoolpickup.test`.toLowerCase();
+    const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (!data?.user) throw new Error('ไม่พบข้อมูลผู้ใช้งาน');
+
+    const { data: profile, error: profileError } = await window.supabaseClient
+      .from('profiles')
+      .select('display_name, role')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
+
+    if (profileError) throw profileError;
+    if (!profile) throw new Error('บัญชีนี้ยังไม่ได้รับสิทธิ์ในระบบ โปรดติดต่อผู้ดูแล');
+
+    const isStaff = ['admin', 'teacher'].includes(profile.role);
+    if ((currentRole === 'parent' && profile.role !== 'parent') ||
+        (currentRole === 'teacher' && !isStaff)) {
+      await window.supabaseClient.auth.signOut();
+      throw new Error('บัญชีนี้ไม่มีสิทธิ์เข้าสู่ระบบในบทบาทที่เลือก');
     }
 
-    // Save session — store student name for display
-    const students = JSON.parse(localStorage.getItem('students') || '[]');
-    const linkedStudent = students.find(s => s.parentId === username);
+    let studentId = null;
+    if (profile.role === 'parent') {
+      const { data: account, error: accountError } = await window.supabaseClient
+        .from('student_accounts')
+        .select('student_code')
+        .eq('auth_user_id', data.user.id)
+        .maybeSingle();
+      if (accountError) throw accountError;
+      if (!account) throw new Error('บัญชียังไม่ได้ผูกกับข้อมูลนักเรียน');
+      studentId = account.student_code;
+    }
+
     sessionStorage.setItem('user', JSON.stringify({
+      id: data.user.id,
       username,
-      role: account.role,
-      name: account.name,
-      displayName: linkedStudent ? linkedStudent.name : account.name,
-      studentId: account.studentId || null,
+      role: profile.role,
+      name: profile.display_name || username,
+      displayName: profile.display_name || username,
+      studentId
     }));
 
     btn.innerHTML = '<span>✅ สำเร็จ!</span>';
-    setTimeout(() => {
-      if (account.role === 'teacher') {
-        window.location.href = 'teacher-dashboard.html';
-      } else {
-        window.location.href = 'parent-dashboard.html';
-      }
-    }, 600);
-  }, 900);
+    window.location.href = isStaff ? 'teacher-dashboard.html' : 'parent-dashboard.html';
+  } catch (error) {
+    await window.supabaseClient?.auth.signOut();
+    showError(error.message || 'เข้าสู่ระบบไม่สำเร็จ');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.innerHTML = '<span>เข้าสู่ระบบ</span><span>→</span>';
+  }
 }
 
 function showError(msg) {
@@ -108,6 +106,5 @@ function showError(msg) {
   el.style.display = 'block';
 }
 
-// Auto-select role from URL param
 const params = new URLSearchParams(window.location.search);
 if (params.get('role') === 'teacher') setRole('teacher');
