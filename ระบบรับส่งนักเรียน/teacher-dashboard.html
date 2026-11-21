@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>แดชบอร์ดครู – ระบบรับส่งนักเรียน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-dashboard">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🏫</div>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-title">SchoolPickup</span>
+        <span class="sidebar-logo-sub">ครู / ผู้ดูแลระบบ</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">👩‍🏫</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-username" id="sidebar-name">ครู</div>
+        <div class="sidebar-role">บัญชีครู/ผู้ดูแล</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">เมนูหลัก</div>
+      <a class="sidebar-nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+        <span class="nav-item-icon">📊</span> ภาพรวม
+        <span class="nav-badge" id="badge-pending">0</span>
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('today')" id="nav-today">
+        <span class="nav-item-icon">📋</span> รายการวันนี้
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('record')" id="nav-record">
+        <span class="nav-item-icon">💾</span> บันทึกการรับ–ส่ง
+      </a>
+      <div class="nav-section-label">จัดการข้อมูล</div>
+      <a class="sidebar-nav-item" onclick="showSection('students')" id="nav-students">
+        <span class="nav-item-icon">👥</span> ข้อมูลนักเรียน
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('accounts')" id="nav-accounts">
+        <span class="nav-item-icon">🔐</span> บัญชีนักเรียน
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('today-status')" id="nav-today-status">
+        <span class="nav-item-icon">📍</span> สถานะนักเรียนวันนี้
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('history')" id="nav-history">
+        <span class="nav-item-icon">🔍</span> ค้นหาประวัติ
+      </a>
+      <a class="sidebar-nav-item" onclick="showSection('report')" id="nav-report">
+        <span class="nav-item-icon">📈</span> รายงานสรุป
+      </a>
+      <div class="nav-section-label">การแจ้งเตือน</div>
+      <a class="sidebar-nav-item" onclick="showSection('notifications')" id="nav-notifications">
+        <span class="nav-item-icon">🔔</span> แจ้งเตือนจากผู้ปกครอง
+        <span class="nav-badge" id="badge-notif" style="display:none">0</span>
+      </a>
+      <div class="nav-section-label">การแจ้งเตือน</div>
+      <a class="sidebar-nav-item" onclick="showSection('notifications')" id="nav-notifications">
+        <span class="nav-item-icon">🔔</span> แจ้งเตือนจากผู้ปกครอง
+        <span class="nav-badge" id="badge-notif" style="display:none">0</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span class="nav-item-icon">🚪</span> ออกจากระบบ
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="page-title" id="topbar-title">ภาพรวม</div>
+        <div class="page-subtitle" id="topbar-sub">แดชบอร์ดครู</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date"></div>
+        <div class="notif-btn">🔔<div class="notif-dot" id="notif-dot"></div></div>
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;background:none;border:none;font-size:22px;cursor:pointer;" id="hamburger-dash">☰</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Section: Dashboard -->
+      <div id="section-dashboard">
+        <div class="summary-cards">
+          <div class="sum-card" style="--card-color:#2563eb">
+            <div class="sum-icon">👥</div>
+            <div class="sum-num" id="card-total-students">0</div>
+            <div class="sum-label">นักเรียนทั้งหมด</div>
+            <div class="sum-trend">ในระบบ</div>
+          </div>
+          <div class="sum-card" style="--card-color:#f59e0b">
+            <div class="sum-icon">⏳</div>
+            <div class="sum-num" id="card-pending">0</div>
+            <div class="sum-label">รอยืนยัน</div>
+            <div class="sum-trend down" id="trend-pending">วันนี้</div>
+          </div>
+          <div class="sum-card" style="--card-color:#10b981">
+            <div class="sum-icon">✅</div>
+            <div class="sum-num" id="card-today-all">0</div>
+            <div class="sum-label">รายการวันนี้</div>
+            <div class="sum-trend">ทั้งหมด</div>
+          </div>
+          <div class="sum-card" style="--card-color:#8b5cf6">
+            <div class="sum-icon">🎒</div>
+            <div class="sum-num" id="card-done-today">0</div>
+            <div class="sum-label">รับแล้ววันนี้</div>
+            <div class="sum-trend">เรียบร้อย</div>
+          </div>
+        </div>
+
+        <!-- Today's pending list -->
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">⏳ รอการยืนยัน</div>
+            <div class="data-section-actions">
+              <button class="btn-sm btn-sm-primary" onclick="confirmAll()">✅ ยืนยันทั้งหมด</button>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>นักเรียน</th>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>หมายเหตุ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="pending-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Today -->
+      <div id="section-today" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📋 รายการรับ–ส่งวันนี้</div>
+            <div class="data-section-actions">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);">
+                <span id="today-last-update"></span>
+                <span id="today-auto-dot" style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;animation:pulse 2s infinite;"></span>
+                <span>อัปเดตอัตโนมัติ</span>
+              </div>
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="today-search" placeholder="ค้นหาชื่อนักเรียน..." oninput="renderToday()" />
+              </div>
+              <button class="btn-sm btn-sm-primary" onclick="renderToday()">🔄 รีเฟรช</button>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>นักเรียน</th>
+                  <th>ชั้น</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>สถานะ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="today-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Record -->
+      <div id="section-record" style="display:none">
+        <div class="form-card">
+          <div class="form-card-title">💾 บันทึกการรับ–ส่งนักเรียน</div>
+          <form onsubmit="submitRecord(event)" id="recordForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">นักเรียน *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon form-select-icon">👤</span>
+                  <select id="record-student" class="form-input" required></select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">วันที่ *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">📅</span>
+                  <input type="date" id="record-date" class="form-input" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">เวลา *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">🕐</span>
+                  <input type="time" id="record-time" class="form-input" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ผู้มารับ *</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon">👤</span>
+                  <input type="text" id="record-pickup-by" class="form-input" placeholder="ชื่อผู้มารับ" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ประเภท</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon form-select-icon">🚗</span>
+                  <select id="record-type" class="form-input">
+                    <option value="pickup">🚗 ผู้ปกครองมารับ</option>
+                    <option value="bus">🚌 รถรับส่ง</option>
+                    <option value="walk">🚶 เดินกลับบ้าน</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">สถานะ</label>
+                <div class="form-input-wrap">
+                  <span class="form-input-icon form-select-icon">📊</span>
+                  <select id="record-status" class="form-input">
+                    <option value="confirmed">✅ ยืนยัน</option>
+                    <option value="done">🎒 รับแล้ว</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group form-group-full">
+                <label class="form-label">หมายเหตุ</label>
+                <div class="form-input-wrap">
+                  <textarea id="record-note" class="form-input" placeholder="หมายเหตุเพิ่มเติม..."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" onclick="document.getElementById('recordForm').reset()">ล้างข้อมูล</button>
+              <button type="submit" class="btn-submit">💾 บันทึก</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Section: Students -->
+      <div id="section-students" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">👥 ข้อมูลนักเรียนทั้งหมด</div>
+            <div class="data-section-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="students-search" placeholder="ค้นหาชื่อ..." oninput="renderStudents()" />
+              </div>
+              <button class="btn-sm btn-sm-primary" onclick="openAddStudent()">+ เพิ่มนักเรียน</button>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>นักเรียน</th>
+                  <th>ชั้น</th>
+                  <th>ผู้ปกครอง</th>
+                  <th>เบอร์โทร</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Accounts -->
+      <div id="section-accounts" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🔐 จัดการบัญชีนักเรียน / ผู้ปกครอง</div>
+            <div class="data-section-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="accounts-search" placeholder="ค้นหารหัสนักเรียน/ชื่อผู้ปกครอง..." oninput="renderAccounts()" />
+              </div>
+              <button class="btn-sm" onclick="printAllPasswords()" style="color:#8b5cf6;border-color:#c4b5fd;">🖨️ พิมพ์รหัสทั้งหมด</button>
+              <button class="btn-sm" onclick="resetAccountsToDemo()" style="color:#f59e0b;border-color:#fcd34d;">🔄 รีเซ็ต</button>
+              <button class="btn-sm btn-sm-primary" onclick="openAddAccount()">+ เพิ่มบัญชีใหม่</button>
+            </div>
+          </div>
+          <!-- Stat Bar -->
+          <div id="accounts-stat-bar" style="padding:0 0 4px 0;"></div>
+          <!-- Password Table Summary -->
+          <div id="accounts-table-summary" style="margin-bottom:20px;"></div>
+          <!-- Card Grid -->
+          <div id="accounts-card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+        </div>
+      </div>
+
+      <!-- Section: Today Status -->
+      <div id="section-today-status" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📍 สถานะนักเรียนทุกคน — วันนี้</div>
+            <div class="data-section-actions">
+              <button class="btn-sm btn-sm-primary" onclick="renderTodayStatus()">🔄 รีเฟรช</button>
+            </div>
+          </div>
+          <div id="status-summary-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;"></div>
+          <div id="today-status-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
+        </div>
+      </div>
+
+      <!-- Section: History -->
+      <div id="section-history" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🔍 ค้นหาประวัติการรับ–ส่ง</div>
+            <div class="data-section-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="hist-search" placeholder="ชื่อนักเรียน/ผู้รับ..." oninput="renderTeacherHistory()" />
+              </div>
+              <input type="date" id="hist-date-from" class="search-input" style="padding-left:14px;width:auto;" onchange="renderTeacherHistory()" placeholder="จากวันที่" />
+              <input type="date" id="hist-date-to" class="search-input" style="padding-left:14px;width:auto;" onchange="renderTeacherHistory()" placeholder="ถึงวันที่" />
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>นักเรียน</th>
+                  <th>ชั้น</th>
+                  <th>วันที่</th>
+                  <th>เวลา</th>
+                  <th>ผู้มารับ</th>
+                  <th>ประเภท</th>
+                  <th>สถานะ</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody id="hist-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Report -->
+      <div id="section-report" style="display:none">
+        <div class="summary-cards">
+          <div class="sum-card" style="--card-color:#2563eb">
+            <div class="sum-icon">📊</div>
+            <div class="sum-num" id="rpt-total">0</div>
+            <div class="sum-label">รายการทั้งหมด</div>
+          </div>
+          <div class="sum-card" style="--card-color:#10b981">
+            <div class="sum-icon">✅</div>
+            <div class="sum-num" id="rpt-done">0</div>
+            <div class="sum-label">รับแล้ว</div>
+          </div>
+          <div class="sum-card" style="--card-color:#f59e0b">
+            <div class="sum-icon">⏳</div>
+            <div class="sum-num" id="rpt-pending">0</div>
+            <div class="sum-label">รอดำเนินการ</div>
+          </div>
+          <div class="sum-card" style="--card-color:#ef4444">
+            <div class="sum-icon">❌</div>
+            <div class="sum-num" id="rpt-cancelled">0</div>
+            <div class="sum-label">ยกเลิก</div>
+          </div>
+        </div>
+
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📈 สรุปรายวัน (7 วันล่าสุด)</div>
+          </div>
+          <div style="padding:24px;" id="daily-report"></div>
+        </div>
+
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">📊 สรุปตามประเภทการรับ</div>
+          </div>
+          <div style="padding:24px;display:flex;gap:16px;flex-wrap:wrap;" id="type-report"></div>
+        </div>
+      </div>
+
+      <!-- Section: Notifications -->
+      <div id="section-notifications" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🔔 การแจ้งเตือนจากผู้ปกครอง</div>
+            <div class="data-section-actions">
+              <button class="btn-sm" onclick="markAllNotificationsRead(); renderNotifications();" style="color:#2563eb;border-color:#93c5fd;">✅ อ่านทั้งหมด</button>
+              <button class="btn-sm" onclick="clearAllNotifications()" style="color:#ef4444;border-color:#fca5a5;">🗑️ ล้างทั้งหมด</button>
+            </div>
+          </div>
+          <div id="notif-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Section: Notifications -->
+      <div id="section-notifications" style="display:none">
+        <div class="data-section">
+          <div class="data-section-header">
+            <div class="data-section-title">🔔 การแจ้งเตือนจากผู้ปกครอง</div>
+            <div class="data-section-actions">
+              <button class="btn-sm" onclick="markAllNotificationsRead(); renderNotifications();" style="color:#2563eb;border-color:#93c5fd;">✅ อ่านทั้งหมด</button>
+              <button class="btn-sm" onclick="clearAllNotifications()" style="color:#ef4444;border-color:#fca5a5;">🗑️ ล้างทั้งหมด</button>
+            </div>
+          </div>
+          <div id="notif-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal: Confirm Status -->
+  <div class="modal-overlay" id="status-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🔄 อัปเดตสถานะ</div>
+        <button class="modal-close" onclick="closeModal('status-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;color:var(--text-secondary);">เลือกสถานะใหม่สำหรับรายการนี้</p>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="status-options"></div>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">หมายเหตุเพิ่มเติม</label>
+          <div class="form-input-wrap">
+            <textarea id="status-note" class="form-input" placeholder="หมายเหตุ (ถ้ามี)..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('status-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveStatus()">💾 บันทึกสถานะ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Student -->
+  <div class="modal-overlay" id="student-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="student-modal-title">➕ เพิ่มนักเรียน</div>
+        <button class="modal-close" onclick="closeModal('student-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">ชื่อ-นามสกุลนักเรียน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👤</span>
+            <input type="text" id="st-name" class="form-input" placeholder="ด.ช./ด.ญ. ชื่อ นามสกุล" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชั้นเรียน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">📚</span>
+            <input type="text" id="st-class" class="form-input" placeholder="เช่น ป.3/1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ปกครอง *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👨‍👩‍👧</span>
+            <input type="text" id="st-parent" class="form-input" placeholder="ชื่อ-นามสกุลผู้ปกครอง" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">เบอร์โทรศัพท์</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">📱</span>
+            <input type="text" id="st-phone" class="form-input" placeholder="0xx-xxx-xxxx" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('student-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveStudent()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Account -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🔐 เพิ่มบัญชีผู้ปกครอง</div>
+        <button class="modal-close" onclick="closeModal('account-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ใช้ (Username) *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👤</span>
+            <input type="text" id="acc-username" class="form-input" placeholder="เช่น 691234" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสผ่าน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">🔒</span>
+            <input type="text" id="acc-password" class="form-input" placeholder="รหัสผ่าน" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ปกครอง *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👨‍👩‍👧</span>
+            <input type="text" id="acc-name" class="form-input" placeholder="ชื่อ-นามสกุลผู้ปกครอง" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผูกกับนักเรียน *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon form-select-icon">🎒</span>
+            <select id="acc-student" class="form-input"></select>
+          </div>
+        </div>
+        <div id="acc-error" style="display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:4px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('account-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveAccount()">💾 บันทึกบัญชี</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Account Password -->
+  <div class="modal-overlay" id="edit-account-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">✏️ แก้ไขบัญชีผู้ปกครอง</div>
+        <button class="modal-close" onclick="closeModal('edit-account-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">🎒 บัญชีของ</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);" id="edit-acc-display-name"></div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="edit-acc-display-username"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ใช้ (Username)</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👤</span>
+            <input type="text" id="edit-acc-username" class="form-input" readonly style="background:var(--bg-primary);opacity:0.7;" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสผ่านใหม่ *</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">🔑</span>
+            <input type="text" id="edit-acc-password" class="form-input" placeholder="กรอกรหัสผ่านใหม่" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ปกครอง</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon">👨‍👩‍👧</span>
+            <input type="text" id="edit-acc-name" class="form-input" placeholder="ชื่อ-นามสกุลผู้ปกครอง" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผูกกับนักเรียน</label>
+          <div class="form-input-wrap">
+            <span class="form-input-icon form-select-icon">🎒</span>
+            <select id="edit-acc-student" class="form-input"></select>
+          </div>
+        </div>
+        <div id="edit-acc-error" style="display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:4px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('edit-account-modal')">ยกเลิก</button>
+        <button class="btn-submit" onclick="saveEditAccount()">💾 บันทึกการแก้ไข</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js?v=5"></script>
+  <script src="js/teacher.js?v=5"></script>
+</body>
+</html>
